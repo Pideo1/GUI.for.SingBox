@@ -5,7 +5,7 @@ import { useI18n } from 'vue-i18n'
 import { useBool, useMessage } from '@/hooks'
 import { deepClone, sampleID, getUserAgent } from '@/utils'
 import { type SubscribeType, useSubscribesStore } from '@/stores'
-import { ProxyTypeOptions, DefaultExcludeProtocols } from '@/constant'
+import { DefaultExcludeProtocols } from '@/constant/kernel'
 
 interface Props {
   id?: string
@@ -133,21 +133,21 @@ if (props.isUpdate) {
       </div>
       <div class="form-item">
         <div class="name">{{ t('subscribe.includeProtocol') }}</div>
-        <Input
+        <!-- <Input
           v-model="sub.includeProtocol"
           :placeholder="ProxyTypeOptions.map((v) => v.label).join('|')"
           auto-size
           class="input"
-        />
+        /> -->
       </div>
       <div class="form-item">
         <div class="name">{{ t('subscribe.excludeProtocol') }}</div>
-        <Input
+        <!-- <Input
           v-model="sub.excludeProtocol"
           :placeholder="ProxyTypeOptions.map((v) => v.label).join('|')"
           auto-size
           class="input"
-        />
+        /> -->
       </div>
       <div class="form-item">
         <div class="name">{{ t('subscribe.proxyPrefix') }}</div>

@@ -350,7 +350,7 @@ export const handleChangeMode = async (mode: 'direct' | 'global' | 'rule') => {
 
   if (mode === kernelApiStore.config.mode) return
 
-  kernelApiStore.updateConfig('mode', mode)
+  // kernelApiStore.updateConfig('mode', mode)
 
   const { connections } = await getConnections()
   const promises = (connections || []).map((v) => deleteConnection(v.id))
@@ -411,4 +411,12 @@ export const exitApp = async () => {
   } catch (err: any) {
     error(err)
   }
+}
+
+export const getKernelFileName = async (isLatest = false) => {
+  const envStore = useEnvStore()
+  const { os } = envStore.env
+  const fileSuffix = { windows: '.exe', linux: '', darwin: '' }[os]
+  const latest = isLatest ? '-latest' : ''
+  return `sing-box${latest}${fileSuffix}`
 }

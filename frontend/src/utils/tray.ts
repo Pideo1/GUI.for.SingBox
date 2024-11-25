@@ -1,5 +1,5 @@
 import i18n from '@/lang'
-import { Theme, type MenuItem, Color, Lang } from '@/constant'
+import { Theme, Color, Lang } from '@/enums/app'
 import { useAppSettingsStore, useKernelApiStore, useEnvStore, usePluginsStore } from '@/stores'
 import {
   Notify,
@@ -14,10 +14,10 @@ import {
   debounce,
   exitApp,
   handleChangeMode,
-  handleUseProxy,
   sampleID,
   APP_TITLE,
-  APP_VERSION
+  APP_VERSION,
+  handleUseProxy
 } from '@/utils'
 
 const getTrayIcons = () => {
@@ -234,7 +234,6 @@ const getTrayMenus = () => {
           text: 'tray.setSystemProxy',
           hidden: envStore.systemProxy,
           event: async () => {
-            await kernelApiStore.updateConfig('tun', false)
             await envStore.setSystemProxy()
           }
         },
@@ -246,30 +245,29 @@ const getTrayMenus = () => {
         }
       ]
     },
-    {
-      type: 'item',
-      text: 'tray.tun',
-      hidden: !appSettings.app.kernel.running,
-      children: [
-        {
-          type: 'item',
-          text: 'tray.enableTunMode',
-          hidden: kernelApiStore.config.tun.enable,
-          event: async () => {
-            await envStore.clearSystemProxy()
-            await kernelApiStore.updateConfig('tun', true)
-          }
-        },
-        {
-          type: 'item',
-          text: 'tray.disableTunMode',
-          hidden: !kernelApiStore.config.tun.enable,
-          event: async () => {
-            await kernelApiStore.updateConfig('tun', false)
-          }
-        }
-      ]
-    },
+    // {
+    //   type: 'item',
+    //   text: 'tray.tun',
+    //   hidden: !appSettings.app.kernel.running,
+    //   children: [
+    //     {
+    //       type: 'item',
+    //       text: 'tray.enableTunMode',
+    //       hidden: kernelApiStore.config.tun.enable,
+    //       event: async () => {
+    //         await envStore.clearSystemProxy()
+    //       }
+    //     },
+    //     {
+    //       type: 'item',
+    //       text: 'tray.disableTunMode',
+    //       hidden: !kernelApiStore.config.tun.enable,
+    //       event: async () => {
+    //         await kernelApiStore.updateConfig('tun', false)
+    //       }
+    //     }
+    //   ]
+    // },
     {
       type: 'item',
       text: 'settings.general',

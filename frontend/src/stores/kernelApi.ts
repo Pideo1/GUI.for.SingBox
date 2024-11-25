@@ -1,30 +1,17 @@
 import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 
-import { deepClone } from '@/utils/others'
-import type { KernelApiConfig, Proxy } from '@/api/kernel.schema'
-import { ProcessInfo, KillProcess, ExecBackground, GetInterfaces, Readfile } from '@/bridge'
-import {
-  KernelWorkDirectory,
-  getKernelFileName,
-  KernelConfigFilePath,
-  StackOptions
-} from '@/constant'
-import { generateConfigFile, ignoredError, updateTrayMenus } from '@/utils'
-import { getConfigs, setConfigs, getProxies, getProviders } from '@/api/kernel'
-import {
-  type ProfileType,
-  useAppSettingsStore,
-  useProfilesStore,
-  useLogsStore,
-  useEnvStore
-} from '@/stores'
+import { ProcessInfo, KillProcess, ExecBackground } from '@/bridge'
+import { CoreWorkingDirectory } from '@/constant/kernel'
+import { generateConfigFile, ignoredError, updateTrayMenus, getKernelFileName } from '@/utils'
+import { getProxies, getProviders, getConfigs } from '@/api/kernel'
+import { useAppSettingsStore, useProfilesStore, useLogsStore, useEnvStore } from '@/stores'
 
 export type ProxyType = 'mixed' | 'http' | 'socks'
 
 export const useKernelApiStore = defineStore('kernelApi', () => {
   /** RESTful API */
-  const config = ref<KernelApiConfig>({
+  const config = ref<IKernelApiConfig>({
     port: 0,
     'mixed-port': 0,
     'socks-port': 0,
@@ -39,113 +26,23 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
     }
   })
 
-  const proxies = ref<Record<string, Proxy>>({})
+  const proxies = ref<Record<string, IKernelProxy>>({})
   const providers = ref<{
     [key: string]: {
       name: string
-      proxies: Proxy[]
+      proxies: IKernelProxy[]
     }
   }>({})
 
-  const currentProfile = ref<ProfileType>()
-  const keepConfig = ref<boolean>(false)
-
-  const updateProfile = async () => {
-    const appSettingsStore = useAppSettingsStore()
-    const { profile: profileID } = appSettingsStore.app.kernel
-    if (profileID) {
-      const profilesStore = useProfilesStore()
-      const result = deepClone(profilesStore.getProfileById(profileID)) as ProfileType
-      const interfaces = await GetInterfaces()
-      result.tunConfig.enable = interfaces.some((f) => f === result.tunConfig['interface-name'])
-
-      if (config.value.mode) {
-        result.generalConfig.mode = config.value.mode
-        result.advancedConfig.port = config.value.port
-        result.generalConfig['mixed-port'] = config.value['mixed-port']
-        result.advancedConfig['socks-port'] = config.value['socks-port']
-        result.generalConfig['allow-lan'] = config.value['allow-lan']
-        result.generalConfig['interface-name'] = config.value['interface-name']
-        result.dnsConfig.fakeip = config.value.fakeip
-        if (config.value.tun.device) {
-          result.tunConfig.enable = config.value.tun.enable
-          result.tunConfig.stack = config.value.tun.stack
-          result.tunConfig['interface-name'] = config.value.tun.device
-        }
-      }
-
-      currentProfile.value = result
-    }
-  }
-
   const refreshConfig = async () => {
-    if (!currentProfile.value) {
-      await updateProfile()
+    config.value = await getConfigs()
+    if (!config.value.tun) {
+      config.value.tun = {
+        enable: false,
+        stack: 'System',
+        device: ''
+      }
     }
-    if (!currentProfile.value) {
-      return
-    }
-    config.value.port = currentProfile.value.advancedConfig.port
-    config.value['mixed-port'] = currentProfile.value.generalConfig['mixed-port']
-    config.value['socks-port'] = currentProfile.value.advancedConfig['socks-port']
-    config.value['allow-lan'] = currentProfile.value.generalConfig['allow-lan']
-    try {
-      config.value.mode = (await getConfigs()).mode
-    } catch {
-      config.value.mode = currentProfile.value.generalConfig.mode
-    }
-    config.value['interface-name'] = currentProfile.value.generalConfig['interface-name']
-    config.value.fakeip = currentProfile.value.dnsConfig.fakeip
-    config.value.tun = {
-      enable: currentProfile.value.tunConfig.enable,
-      stack: currentProfile.value.tunConfig.stack,
-      device: currentProfile.value.tunConfig['interface-name']
-    }
-  }
-
-  const patchConfig = async (name: string, value: any) => {
-    const body: Record<string, any> = {}
-    body[name] = value
-    await setConfigs(body)
-    await updateCurrentProfile(name, value)
-  }
-
-  const updateCurrentProfile = async (name: string, value: any) => {
-    if (!currentProfile.value) {
-      return
-    }
-
-    if (name == 'tun') {
-      currentProfile.value.tunConfig.enable = value
-    } else if (name == 'http-port') {
-      currentProfile.value.advancedConfig.port = value
-    } else if (name == 'socks-port') {
-      currentProfile.value.advancedConfig['socks-port'] = value
-    } else if (name == 'mixed-port') {
-      currentProfile.value.generalConfig['mixed-port'] = value
-    } else if (name == 'allow-lan') {
-      currentProfile.value.generalConfig['allow-lan'] = value
-    } else if (name == 'tun-stack') {
-      currentProfile.value.tunConfig.stack = value
-    } else if (name == 'tun-device') {
-      currentProfile.value.tunConfig['interface-name'] = value
-    } else if (name == 'interface-name') {
-      currentProfile.value.generalConfig['interface-name'] = value
-    } else if (name == 'mode') {
-      currentProfile.value.generalConfig.mode = value
-    } else if (name == 'fakeip') {
-      currentProfile.value.dnsConfig.fakeip = value
-    }
-
-    await refreshConfig()
-  }
-
-  const updateConfig = async (name: string, value: any) => {
-    updateCurrentProfile(name, value)
-    if (currentProfile.value) {
-      await generateConfigFile(currentProfile.value)
-    }
-    await restartKernelKeepConfig()
   }
 
   const refreshProviderProxies = async () => {
@@ -153,51 +50,6 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
     providers.value = a
     proxies.value = b
   }
-
-  const initConfig = async () => {
-    const content = (await ignoredError(Readfile, KernelConfigFilePath)) || '{}'
-    if (!content) return
-    try {
-      const latestConfig: Record<string, any> = JSON.parse(content)
-      config.value.port = 0
-      config.value['mixed-port'] = 0
-      config.value['socks-port'] = 0
-      let inbound_tun: any = null
-      latestConfig.inbounds?.forEach((inbound: any) => {
-        if (inbound.type == 'tun') inbound_tun = inbound
-        else if (inbound.type == 'mixed') config.value['mixed-port'] = inbound.listen_port
-        else if (inbound.type == 'http') config.value.port = inbound.listen_port
-        else if (inbound.type == 'socks') config.value['socks-port'] = inbound.listen_port
-        if (inbound.listen_port) {
-          config.value['allow-lan'] = inbound.listen === '::'
-        }
-      })
-
-      try {
-        config.value.mode = (await getConfigs()).mode
-      } catch {
-        config.value.mode = latestConfig.experimental?.clash_api.default_mode
-      }
-
-      config.value.fakeip = latestConfig.dns?.fakeip.enabled
-      if (latestConfig.route?.auto_detect_interface) config.value['interface-name'] = 'Auto'
-      else if (latestConfig.route?.default_interface)
-        config.value['interface-name'] = latestConfig.route.default_interface
-      if (inbound_tun) {
-        const stack = StackOptions.filter((s) => s.value.toLowerCase() === inbound_tun.stack)
-        const stackName = stack.length > 0 ? stack[0].value : inbound_tun.stack
-        config.value.tun = {
-          enable: true,
-          stack: stackName,
-          device: inbound_tun.interface_name
-        }
-      }
-    } catch (e) {
-      console.error(e)
-    }
-  }
-
-  initConfig()
 
   /* Bridge API */
   const loading = ref(false)
@@ -246,15 +98,11 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
     if (!profile) throw 'Profile does not exist: ' + profileID
 
     await stopKernel()
-
-    if (!keepConfig.value) {
-      await generateConfigFile(profile)
-      currentProfile.value = deepClone(profile)
-    }
+    await generateConfigFile(profile)
 
     const fileName = await getKernelFileName(branch === 'latest')
-    const kernelFilePath = KernelWorkDirectory + '/' + fileName
-    const kernelWorkDir = envStore.env.basePath + '/' + KernelWorkDirectory
+    const kernelFilePath = CoreWorkingDirectory + '/' + fileName
+    const kernelWorkDir = envStore.env.basePath + '/' + CoreWorkingDirectory
 
     loading.value = true
 
@@ -267,11 +115,7 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
 
         await Promise.all([refreshConfig(), refreshProviderProxies()])
 
-        if (config.value.tun.enable) {
-          if (envStore.systemProxy) {
-            updateConfig('tun', false)
-          }
-        } else if (appSettingsStore.app.autoSetSystemProxy) {
+        if (appSettingsStore.app.autoSetSystemProxy) {
           await envStore.setSystemProxy()
         }
       }
@@ -319,13 +163,6 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
     }
 
     logsStore.clearKernelLog()
-  }
-
-  const restartKernelKeepConfig = async () => {
-    keepConfig.value = true
-    await stopKernel()
-    await startKernel()
-    keepConfig.value = false
   }
 
   const restartKernel = async () => {
@@ -378,8 +215,6 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
     proxies,
     providers,
     refreshConfig,
-    updateConfig,
-    patchConfig,
     refreshProviderProxies,
     getProxyPort
   }

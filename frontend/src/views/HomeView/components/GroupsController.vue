@@ -2,7 +2,6 @@
 import { ref, computed, onActivated } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { ProxyGroupType } from '@/constant'
 import { useMessage, usePrompt } from '@/hooks'
 import { ignoredError, sleep, handleUseProxy } from '@/utils'
 import { useAppSettingsStore, useKernelApiStore } from '@/stores'
@@ -21,44 +20,45 @@ const appSettings = useAppSettingsStore()
 const kernelApiStore = useKernelApiStore()
 
 const groups = computed(() => {
-  const { proxies } = kernelApiStore
-  return Object.values(proxies)
-    .filter((v) => v.all && v.name !== 'GLOBAL')
-    .concat(proxies.GLOBAL || [])
-    .map((group) => {
-      const all = group.all
-        .filter((proxy) => {
-          const history = proxies[proxy].history || []
-          const alive = history[history.length - 1]?.delay > 0
-          const condition1 =
-            appSettings.app.kernel.unAvailable ||
-            ['direct', 'block'].includes(proxy) ||
-            proxies[proxy].all ||
-            alive
-          const keywords = filterKeywordsMap.value[group.name]
-          const condition2 = keywords ? new RegExp(keywords, 'i').test(proxy) : true
-          return condition1 && condition2
-        })
-        .map((proxy) => {
-          const history = proxies[proxy].history || []
-          const delay = history[history.length - 1]?.delay || 0
-          return { ...proxies[proxy], delay }
-        })
-        .sort((a, b) => {
-          if (!appSettings.app.kernel.sortByDelay || a.delay === b.delay) return 0
-          if (!a.delay) return 1
-          if (!b.delay) return -1
-          return a.delay - b.delay
-        })
+  return []
+  // const { proxies } = kernelApiStore
+  // return Object.values(proxies)
+  //   .filter((v) => v.all && v.name !== 'GLOBAL')
+  //   .concat(proxies.GLOBAL || [])
+  //   .map((group) => {
+  //     const all = group.all
+  //       .filter((proxy) => {
+  //         const history = proxies[proxy].history || []
+  //         const alive = history[history.length - 1]?.delay > 0
+  //         const condition1 =
+  //           appSettings.app.kernel.unAvailable ||
+  //           ['direct', 'block'].includes(proxy) ||
+  //           proxies[proxy].all ||
+  //           alive
+  //         const keywords = filterKeywordsMap.value[group.name]
+  //         const condition2 = keywords ? new RegExp(keywords, 'i').test(proxy) : true
+  //         return condition1 && condition2
+  //       })
+  //       .map((proxy) => {
+  //         const history = proxies[proxy].history || []
+  //         const delay = history[history.length - 1]?.delay || 0
+  //         return { ...proxies[proxy], delay }
+  //       })
+  //       .sort((a, b) => {
+  //         if (!appSettings.app.kernel.sortByDelay || a.delay === b.delay) return 0
+  //         if (!a.delay) return 1
+  //         if (!b.delay) return -1
+  //         return a.delay - b.delay
+  //       })
 
-      const chains = [group.now]
-      let tmp = proxies[group.now]
-      while (tmp) {
-        tmp.now && chains.push(tmp.now)
-        tmp = proxies[tmp.now]
-      }
-      return { ...group, all, chains }
-    })
+  //     const chains = [group.now]
+  //     let tmp = proxies[group.now]
+  //     while (tmp) {
+  //       tmp.now && chains.push(tmp.now)
+  //       tmp = proxies[tmp.now]
+  //     }
+  //     return { ...group, all, chains }
+  //   })
 })
 
 const useProxyWithCatchError = (group: any, proxy: any) => {
@@ -204,7 +204,7 @@ onActivated(() => {
       />
     </div>
   </div>
-  <div v-for="group in groups" :key="group.name" class="groups">
+  <!-- <div v-for="group in groups" :key="group.name" class="groups">
     <div class="header" @click="toggleExpanded(group.name)">
       <div class="group-info">
         <span class="group-name">{{ group.name }}</span>
@@ -286,7 +286,7 @@ onActivated(() => {
         </template>
       </div>
     </Transition>
-  </div>
+  </div> -->
 </template>
 
 <style lang="less" scoped>
