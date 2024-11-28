@@ -21,12 +21,12 @@ const SubscribesNameMap = ref<Record<string, string>>({})
 const proxyGroup = ref([
   {
     id: 'Built-in',
-    name: 'kernel.proxyGroups.builtIn',
+    name: 'kernel.outbounds.builtIn',
     proxies: model.value.map(({ id, tag, type }) => ({ id, tag, type: type as string }))
   },
   {
     id: 'Subscription',
-    name: 'kernel.proxyGroups.subscriptions',
+    name: 'kernel.outbounds.subscriptions',
     proxies: []
   }
 ])

@@ -129,7 +129,9 @@ export default {
       sort: '查看和排序',
       refs: '引用订阅&引用节点',
       noSubs: '订阅列表为空',
-      empty: '该订阅下无可用代理'
+      empty: '该订阅下无可用代理',
+      builtIn: '内置',
+      subscriptions: '订阅'
     },
     route: {
       tab: {
@@ -208,8 +210,8 @@ export default {
         process_path_regex: 'process_path_regex',
         clash_mode: 'clash_mode',
         rule_set: 'rule_set',
-        logical: 'logical',
-        outbound: 'outbound'
+        outbound: 'outbound',
+        inline: '内联'
       }
     },
     strategy: {

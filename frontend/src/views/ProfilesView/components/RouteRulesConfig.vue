@@ -64,12 +64,7 @@ const handleDelete = (index: number) => {
 const showLost = () => message.warn('kernel.route.rules.notFound')
 
 const isSupportPayload = computed(() => {
-  const a = [
-    RuleAction.Route,
-    RuleAction.RouteOptions,
-    RuleAction.Resolve,
-    RuleAction.Sniff
-  ].includes(fields.value.action as any)
+  const a = fields.value.action !== RuleAction.HijackDNS
   const b = ![RuleType.RuleSet].includes(fields.value.type as any)
   return a && b
 })
@@ -80,6 +75,9 @@ const hasLost = (rule: IRule) => {
   }
   if (rule.type === RuleType.Inbound) {
     return !props.inboundOptions.find((v) => v.value === rule.payload)
+  }
+  if (rule.action !== RuleAction.Route) {
+    return false
   }
   const outboundLost = !props.outboundOptions.find((v) => v.value === rule.outbound)
   if (rule.type === RuleType.RuleSet) {
@@ -188,6 +186,13 @@ const renderRule = (rule: IRule) => {
         v-else-if="fields.type === RuleType.Inbound"
         v-model="fields.payload"
         :options="inboundOptions"
+      />
+      <CodeViewer
+        v-else-if="fields.type === RuleType.Inline"
+        v-model="fields.payload"
+        editable
+        lang="json"
+        style="min-width: 320px"
       />
       <Input v-else v-model="fields.payload" />
     </div>

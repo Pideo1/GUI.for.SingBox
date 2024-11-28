@@ -2,7 +2,7 @@ import {
   ClashMode,
   Inbound,
   Outbound,
-  TunStackEnum,
+  TunStack,
   LogLevel,
   RuleType,
   RulesetFormat,
@@ -75,17 +75,6 @@ export const OutboundOptions = [
   { label: 'kernel.outbounds.direct', value: Outbound.Direct },
   { label: 'kernel.outbounds.selector', value: Outbound.Selector },
   { label: 'kernel.outbounds.urltest', value: Outbound.Urltest }
-]
-
-export const GroupsTypeOptions = [
-  {
-    label: 'kernel.proxyGroups.type.select',
-    value: Outbound.Selector
-  },
-  {
-    label: 'kernel.proxyGroups.type.url-test',
-    value: Outbound.Urltest
-  }
 ]
 
 export const RulesTypeOptions = [
@@ -166,12 +155,8 @@ export const RulesTypeOptions = [
     value: RuleType.RuleSet
   },
   {
-    label: 'kernel.rules.type.logical',
-    value: RuleType.Logical
-  },
-  {
-    label: 'kernel.rules.type.logical',
-    value: RuleType.Logical
+    label: 'kernel.rules.type.inline',
+    value: RuleType.Inline
   }
 ]
 
@@ -183,9 +168,9 @@ export const DnsRuleTypeOptions = RulesTypeOptions.concat([
 ])
 
 export const TunStackOptions = [
-  { label: 'kernel.tun.system', value: TunStackEnum.System },
-  { label: 'kernel.tun.gvisor', value: TunStackEnum.GVisor },
-  { label: 'kernel.tun.mixed', value: TunStackEnum.Mixed }
+  { label: 'kernel.inbounds.tun.system', value: TunStack.System },
+  { label: 'kernel.inbounds.tun.gvisor', value: TunStack.GVisor },
+  { label: 'kernel.inbounds.tun.mixed', value: TunStack.Mixed }
 ]
 
 export const RulesetTypeOptions = [
@@ -200,11 +185,11 @@ export const RulesetFormatOptions = [
 ]
 
 export const DomainStrategyOptions = [
-  { label: 'kernel.dns.strategy.default', value: '' },
-  { label: 'kernel.dns.strategy.prefer_ipv4', value: Strategy.PreferIPv4 },
-  { label: 'kernel.dns.strategy.prefer_ipv6', value: Strategy.PreferIPv6 },
-  { label: 'kernel.dns.strategy.ipv4_only', value: Strategy.IPv4Only },
-  { label: 'kernel.dns.strategy.ipv6_only', value: Strategy.IPv6Only }
+  { label: 'kernel.strategy.default', value: '' },
+  { label: 'kernel.strategy.prefer_ipv4', value: Strategy.PreferIPv4 },
+  { label: 'kernel.strategy.prefer_ipv6', value: Strategy.PreferIPv6 },
+  { label: 'kernel.strategy.ipv4_only', value: Strategy.IPv4Only },
+  { label: 'kernel.strategy.ipv6_only', value: Strategy.IPv6Only }
 ]
 
 export const RuleActionOptions = [

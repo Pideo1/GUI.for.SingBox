@@ -45,6 +45,10 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
     }
   }
 
+  const updateConfig = async (field: string, value: any) => {
+    console.log(field, value)
+  }
+
   const refreshProviderProxies = async () => {
     const [{ providers: a }, { proxies: b }] = await Promise.all([getProviders(), getProxies()])
     providers.value = a
@@ -215,6 +219,7 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
     proxies,
     providers,
     refreshConfig,
+    updateConfig,
     refreshProviderProxies,
     getProxyPort
   }

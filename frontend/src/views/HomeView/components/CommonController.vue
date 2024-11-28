@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 
-import { StackOptions } from '@/constant'
+import { TunStackOptions } from '@/constant/kernel'
 import { useKernelApiStore } from '@/stores'
 
 const { t } = useI18n()
@@ -68,7 +68,7 @@ const onFakeIpChange = (name: string) => kernelApiStore.updateConfig('fakeip', n
     <Card :title="t('kernel.tun.stack')" class="card-item">
       <Select
         v-model="kernelApiStore.config.tun.stack"
-        :options="StackOptions"
+        :options="TunStackOptions"
         :border="false"
         auto-size
         @change="conStackChange"

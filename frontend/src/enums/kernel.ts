@@ -27,7 +27,7 @@ export enum Outbound {
   Urltest = 'urltest'
 }
 
-export enum TunStackEnum {
+export enum TunStack {
   System = 'system',
   GVisor = 'gVisor',
   Mixed = 'mixed'
@@ -64,9 +64,10 @@ export enum RuleType {
   ProcessPathRegex = 'process_path_regex',
   ClashMode = 'clash_mode',
   RuleSet = 'rule_set',
-  Logical = 'logical',
   // dns rule type
-  Outbound = 'outbound'
+  Outbound = 'outbound',
+  // GUI
+  Inline = 'inline'
 }
 
 export enum Strategy {

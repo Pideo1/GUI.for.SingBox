@@ -96,29 +96,32 @@ interface IOutbound {
   interrupt_exist_connections: boolean
 }
 
+type RuleType =
+  | 'inbound'
+  | 'network'
+  | 'protocol'
+  | 'domain'
+  | 'domain_suffix'
+  | 'domain_keyword'
+  | 'domain_regex'
+  | 'source_ip_cidr'
+  | 'ip_cidr'
+  | 'source_port'
+  | 'source_port_range'
+  | 'port'
+  | 'port_range'
+  | 'process_name'
+  | 'process_path'
+  | 'process_path_regex'
+  | 'rule_set'
+  | 'ip_is_private'
+  | 'clash_mode'
+  | 'outbound'
+  | 'inline'
+
 interface IRule {
   id: string
-  type:
-    | 'inbound'
-    | 'network'
-    | 'protocol'
-    | 'domain'
-    | 'domain_suffix'
-    | 'domain_keyword'
-    | 'domain_regex'
-    | 'source_ip_cidr'
-    | 'ip_cidr'
-    | 'source_port'
-    | 'source_port_range'
-    | 'port'
-    | 'port_range'
-    | 'process_name'
-    | 'process_path'
-    | 'process_path_regex'
-    | 'rule_set'
-    | 'ip_is_private'
-    | 'clash_mode'
-    | 'logical'
+  type: RuleType
   payload: string
   invert: boolean
   action: RuleAction
@@ -153,7 +156,7 @@ interface IDNSServer {
 
 interface IDNSRule {
   id: string
-  type: 'outbound' | 'clash_mode' | 'rule_set'
+  type: RuleType
   payload: string
   action: DnsRuleAction
   server: string

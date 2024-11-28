@@ -3,7 +3,7 @@ import {
   LogLevel,
   Inbound,
   Outbound,
-  TunStackEnum,
+  TunStack,
   ClashMode,
   RulesetType,
   RulesetFormat,
@@ -57,7 +57,7 @@ export const DefaultExperimental = (): IExperimental => ({
     external_ui_download_detour: DefaultOutboundIds.Direct,
     secret: sampleID(),
     default_mode: ClashMode.Rule,
-    access_control_allow_origin: ['http://127.0.0.1'],
+    access_control_allow_origin: ['*'],
     access_control_allow_private_network: false
   },
   cache_file: {
@@ -89,7 +89,7 @@ export const DefaultInboundTun = (): IInbound['tun'] => ({
   strict_route: true,
   route_address: ['0.0.0.0/1', '128.0.0.0/1', '::/1', '8000::/1'],
   endpoint_independent_nat: false,
-  stack: TunStackEnum.Mixed
+  stack: TunStack.Mixed
 })
 
 export const DefaultInbounds = (): IInbound[] => [
@@ -264,6 +264,17 @@ export const DefaultRoute = (): IRoute => ({
     },
     {
       id: sampleID(),
+      type: RuleType.Inline,
+      payload: '{\n  "network": "udp",\n  "port": 443\n}',
+      invert: false,
+      action: RuleAction.Reject,
+      outbound: '',
+      sniffer: [],
+      strategy: Strategy.Default,
+      server: ''
+    },
+    {
+      id: sampleID(),
       type: RuleType.RuleSet,
       payload: DefaultRulesetIds.CATEGORY_ADS,
       invert: false,
@@ -418,7 +429,7 @@ export const DefaultDnsServers = (): IDNSServer[] => [
 
 export const DefaultDnsRule = (): IDNSRule => ({
   id: sampleID(),
-  type: 'outbound',
+  type: RuleType.Outbound,
   payload: '',
   action: RuleAction.Route,
   server: ''

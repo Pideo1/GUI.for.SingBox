@@ -1,11 +1,12 @@
 import { Readfile, Writefile } from '@/bridge'
 import { CoreConfigFilePath } from '@/constant/kernel'
 import { deepAssign, deepClone } from './others'
-import { Inbound, Outbound, RuleAction, RulesetType, Strategy } from '@/enums/kernel'
+import { Inbound, Outbound, RuleAction, RulesetType, RuleType, Strategy } from '@/enums/kernel'
 import { usePluginsStore, useSubscribesStore } from '@/stores'
 
 const generateInbounds = (inbounds: IInbound[]) => {
-  return inbounds.map((inbound) => {
+  return inbounds.flatMap((inbound) => {
+    if (!inbound.enable) return []
     if (inbound.type === Inbound.Mixed) {
       return {
         type: inbound.type,
@@ -82,6 +83,11 @@ const generateRoute = (route: IRoute, outbounds: IOutbound[], dns: IDNS) => {
   return {
     rules: route.rules.map((rule) => {
       const extra: Recordable = {}
+      if (rule.type === RuleType.Inline) {
+        deepAssign(extra, JSON.parse(rule.payload))
+      } else {
+        extra[rule.type] = rule.payload
+      }
       if (rule.action === RuleAction.Route) {
         extra.outbound = getOutbound(rule.outbound)
       } else if (rule.action === RuleAction.Sniff) {
@@ -96,7 +102,6 @@ const generateRoute = (route: IRoute, outbounds: IOutbound[], dns: IDNS) => {
         extra.invert = true
       }
       return {
-        [rule.type]: rule.payload,
         action: rule.action,
         ...extra
       }
@@ -151,6 +156,19 @@ const generateDns = (dns: IDNS, outbounds: IOutbound[]) => {
         address: server.address,
         address_resolver: getDnsServer(server.address_resolver),
         detour: getOutbound(server.detour),
+        ...extra
+      }
+    }),
+    rules: dns.rules.map((rule) => {
+      const extra: Recordable = {}
+      if (rule.type === RuleType.Inline) {
+        deepAssign(extra, JSON.parse(rule.payload))
+      } else {
+        extra[rule.type] = rule.payload
+      }
+      return {
+        action: rule.action,
+        server: getDnsServer(rule.server),
         ...extra
       }
     }),

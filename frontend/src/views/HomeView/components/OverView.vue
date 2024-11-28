@@ -96,7 +96,7 @@ onUnmounted(() => {
         />
       </div>
       <div class="mode">
-        <div class="title">{{ t('kernel.mode') }}</div>
+        <div class="title">{{ t('kernel.clash_api.default_mode') }}</div>
         <Card
           v-for="mode in ModeOptions"
           :key="mode.value"

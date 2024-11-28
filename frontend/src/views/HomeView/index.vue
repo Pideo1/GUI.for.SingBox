@@ -72,7 +72,7 @@ const onMouseWheel = (e: WheelEvent) => {
 
 const onTunSwitchChange = async (enable: boolean) => {
   try {
-    // await kernelApiStore.updateConfig('tun', enable)
+    await kernelApiStore.updateConfig('tun', enable)
   } catch (error: any) {
     console.error(error)
     message.error(error)
@@ -135,7 +135,13 @@ watch(showController, (v) => {
     <template v-else-if="!kernelApiStore.statusLoading">
       <div :class="{ blur: showController }">
         <div class="kernel-status">
-          <Button @click="toggleSettingsModal" type="text" size="small" icon="settings" />
+          <Button
+            @click="toggleSettingsModal"
+            type="text"
+            size="small"
+            icon="settings"
+            style="display: none"
+          />
           <Switch
             v-model="envStore.systemProxy"
             @change="onSystemProxySwitchChange"

@@ -128,7 +128,9 @@ export default {
       sort: 'Viwe and Sort',
       refs: 'Reference subscription & outbound',
       noSubs: 'The subscription list is empty.',
-      empty: 'No available proxies under this subscription.'
+      empty: 'No available proxies under this subscription.',
+      builtIn: 'Built-In',
+      subscriptions: 'Subscriptions'
     },
     route: {
       tab: {
@@ -207,7 +209,6 @@ export default {
         process_path_regex: 'process_path_regex',
         clash_mode: 'clash_mode',
         rule_set: 'rule_set',
-        logical: 'logical',
         outbound: 'outbound'
       }
     },

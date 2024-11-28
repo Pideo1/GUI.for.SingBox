@@ -101,7 +101,14 @@ const renderRule = (rule: IDNSRule) => {
     </div>
     <div class="form-item">
       {{ t('kernel.dns.rules.payload') }}
-      <Input v-model="fields.payload" />
+      <CodeViewer
+        v-if="fields.type === RuleType.Inline"
+        v-model="fields.payload"
+        editable
+        lang="json"
+        style="min-width: 220px"
+      />
+      <Input v-else v-model="fields.payload" />
     </div>
     <div class="form-item">
       {{ t('kernel.dns.rules.action') }}
