@@ -37,6 +37,10 @@ export const Colors = {
   [Color.Green]: {
     primary: 'green',
     secondary: '#025f02'
+  },
+  [Color.Purple]: {
+    primary: 'purple',
+    secondary: '#6a0f9c'
   }
 }
 

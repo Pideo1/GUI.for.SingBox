@@ -524,7 +524,8 @@ export default {
       pink: 'Pink',
       red: 'Red',
       skyblue: 'Skyblue',
-      green: 'Green'
+      green: 'Green',
+      purple: 'Purple'
     },
     fontFamily: 'Font-Family',
     resetFont: 'Reset Font-Family',

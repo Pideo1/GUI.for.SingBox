@@ -91,7 +91,7 @@ onUnmounted(() => window.removeEventListener('resize', onResize))
       class="appname"
     >
       {{ APP_TITLE }} {{ APP_VERSION }} {{ rollingReleaseVersion || '' }}
-      {{ rollingReleaseVersion ? '- Rolling Release' : '' }}
+      {{ rollingReleaseVersion ? '- Rolling Release - Alpha' : '' }}
     </div>
     <Button v-if="kernelApiStore.loading" loading type="text" size="small" />
     <div v-menu="menus" class="menus"></div>

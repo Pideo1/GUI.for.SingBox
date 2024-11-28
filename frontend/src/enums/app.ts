@@ -31,7 +31,8 @@ export enum Color {
   Pink = 'pink',
   Red = 'red',
   Skyblue = 'skyblue',
-  Green = 'green'
+  Green = 'green',
+  Purple = 'purple'
 }
 
 export enum ScheduledTasksType {
