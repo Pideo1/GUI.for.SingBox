@@ -2,7 +2,7 @@ import { Readfile, Writefile } from '@/bridge'
 import { CoreConfigFilePath } from '@/constant/kernel'
 import { deepAssign, deepClone } from './others'
 import { Inbound, Outbound, RuleAction, RulesetType, RuleType, Strategy } from '@/enums/kernel'
-import { usePluginsStore, useSubscribesStore } from '@/stores'
+import { usePluginsStore, useRulesetsStore, useSubscribesStore } from '@/stores'
 
 const generateInbounds = (inbounds: IInbound[]) => {
   return inbounds.flatMap((inbound) => {
@@ -76,6 +76,10 @@ const generateOutbounds = async (outbounds: IOutbound[]) => {
 const generateRoute = (route: IRoute, outbounds: IOutbound[], dns: IDNS) => {
   const getOutbound = (id: string) => outbounds.find((v) => v.id === id)?.tag
   const getDnsServer = (id: string) => dns.servers.find((v) => v.id === id)?.tag
+  const getRuleset = (id: string) => route.rule_set.find((v) => v.id === id)?.tag
+
+  const rulesetsStore = useRulesetsStore()
+
   const extra: Recordable = {}
   if (!route.auto_detect_interface) {
     extra.default_interface = route.default_interface
@@ -85,6 +89,8 @@ const generateRoute = (route: IRoute, outbounds: IOutbound[], dns: IDNS) => {
       const extra: Recordable = {}
       if (rule.type === RuleType.Inline) {
         deepAssign(extra, JSON.parse(rule.payload))
+      } else if (rule.type === RuleType.RuleSet) {
+        extra[rule.type] = getRuleset(rule.payload)
       } else {
         extra[rule.type] = rule.payload
       }
@@ -112,7 +118,8 @@ const generateRoute = (route: IRoute, outbounds: IOutbound[], dns: IDNS) => {
         extra.format = ruleset.format
       }
       if (ruleset.type === RulesetType.Local) {
-        extra.path = ruleset.path
+        const _ruleset = rulesetsStore.getRulesetById(ruleset.path)
+        extra.path = _ruleset?.path.replace('data/', '../')
       } else if (ruleset.type === RulesetType.Remote) {
         extra.url = ruleset.url
         extra.download_detour = getOutbound(ruleset.download_detour)
