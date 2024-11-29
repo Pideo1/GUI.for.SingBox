@@ -32,18 +32,20 @@ const [showMore, toggleMore] = useBool(false)
       {{ t('kernel.log.disabled') }}
       <Switch v-model="model.log.disabled" />
     </div>
-    <div v-if="!model.log.disabled" class="form-item">
-      {{ t('kernel.log.level') }}
-      <Radio v-model="model.log.level" :options="LogLevelOptions" />
-    </div>
-    <div class="form-item">
-      {{ t('kernel.log.output') }}
-      <Input v-model="model.log.output" editable />
-    </div>
-    <div class="form-item">
-      {{ t('kernel.log.timestamp') }}
-      <Switch v-model="model.log.timestamp" />
-    </div>
+    <template v-if="!model.log.disabled">
+      <div class="form-item">
+        {{ t('kernel.log.level') }}
+        <Radio v-model="model.log.level" :options="LogLevelOptions" />
+      </div>
+      <div class="form-item">
+        {{ t('kernel.log.output') }}
+        <Input v-model="model.log.output" editable />
+      </div>
+      <div class="form-item">
+        {{ t('kernel.log.timestamp') }}
+        <Switch v-model="model.log.timestamp" />
+      </div>
+    </template>
     <div class="form-item">
       {{ t('kernel.clash_api.external_controller') }}
       <Input v-model="model.experimental.clash_api.external_controller" editable />

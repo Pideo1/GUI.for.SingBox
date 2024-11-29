@@ -185,7 +185,7 @@ export const RulesetFormatOptions = [
 ]
 
 export const DomainStrategyOptions = [
-  { label: 'kernel.strategy.default', value: '' },
+  { label: 'kernel.strategy.default', value: Strategy.Default },
   { label: 'kernel.strategy.prefer_ipv4', value: Strategy.PreferIPv4 },
   { label: 'kernel.strategy.prefer_ipv6', value: Strategy.PreferIPv6 },
   { label: 'kernel.strategy.ipv4_only', value: Strategy.IPv4Only },

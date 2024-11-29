@@ -17,7 +17,7 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const model = defineModel<IDNSServer[]>({ default: DefaultDnsServers })
+const model = defineModel<IDNSServer[]>({ default: DefaultDnsServers() })
 
 let serverId = 0
 const fields = ref<IDNSServer>(DefaultDnsServer())
@@ -91,7 +91,7 @@ const renderServer = (server: IDNSServer) => {
   >
     <div class="form-item">
       {{ t('kernel.dns.tag') }}
-      <Input v-model="fields.tag" />
+      <Input v-model="fields.tag" autofocus />
     </div>
     <div class="form-item">
       {{ t('kernel.dns.address') }}

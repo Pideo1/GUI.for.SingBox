@@ -129,7 +129,7 @@ defineExpose({ handleAdd })
         </div>
         <div class="form-item">
           {{ t('kernel.inbounds.tun.mtu') }}
-          <Input v-model="inbound.tun.mtu" number />
+          <Input v-model="inbound.tun.mtu" number editable />
         </div>
         <div :class="{ 'flex-start': inbound.tun.address.length }" class="form-item">
           {{ t('kernel.inbounds.tun.address') }}

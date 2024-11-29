@@ -46,7 +46,7 @@ export const DefaultLog = (): ILog => ({
   disabled: false,
   level: LogLevel.Info,
   output: '',
-  timestamp: true
+  timestamp: false
 })
 
 export const DefaultExperimental = (): IExperimental => ({
@@ -104,7 +104,7 @@ export const DefaultInbounds = (): IInbound[] => [
     id: DefaultInboundIds.Tun,
     type: Inbound.Tun,
     tag: 'tun-in',
-    enable: true,
+    enable: false,
     tun: DefaultInboundTun()
   }
 ]
@@ -183,13 +183,13 @@ export const DefaultOutbounds = (): IOutbound[] => [
 
 export const DefaultRouteRule = (): IRule => ({
   id: sampleID(),
-  type: 'rule_set',
+  type: RuleType.RuleSet,
   payload: '',
   invert: false,
-  action: 'route',
+  action: RuleAction.Route,
   outbound: '',
   sniffer: [],
-  strategy: 'ipv4_only',
+  strategy: Strategy.Default,
   server: ''
 })
 
@@ -218,17 +218,17 @@ export const DefaultRoute = (): IRoute => ({
       strategy: Strategy.Default,
       server: ''
     },
-    {
-      id: sampleID(),
-      type: RuleType.Inbound,
-      payload: DefaultInboundIds.MixedIn,
-      invert: false,
-      action: RuleAction.Sniff,
-      outbound: '',
-      sniffer: [],
-      strategy: Strategy.Default,
-      server: ''
-    },
+    // {
+    //   id: sampleID(),
+    //   type: RuleType.Inbound,
+    //   payload: DefaultInboundIds.MixedIn,
+    //   invert: false,
+    //   action: RuleAction.Sniff,
+    //   outbound: '',
+    //   sniffer: [],
+    //   strategy: Strategy.Default,
+    //   server: ''
+    // },
     {
       id: sampleID(),
       type: RuleType.Protocol,
@@ -415,21 +415,21 @@ export const DefaultDnsServers = (): IDNSServer[] => [
     detour: DefaultOutboundIds.Select,
     strategy: Strategy.Default,
     client_subnet: ''
-  },
-  {
-    id: DefaultDnsServersIds.FakeIP,
-    tag: 'fake-ip',
-    address: 'fakeip',
-    address_resolver: '',
-    detour: '',
-    strategy: Strategy.Default,
-    client_subnet: ''
   }
+  // {
+  //   id: DefaultDnsServersIds.FakeIP,
+  //   tag: 'fake-ip',
+  //   address: 'fakeip',
+  //   address_resolver: '',
+  //   detour: '',
+  //   strategy: Strategy.Default,
+  //   client_subnet: ''
+  // }
 ]
 
 export const DefaultDnsRule = (): IDNSRule => ({
   id: sampleID(),
-  type: RuleType.Outbound,
+  type: RuleType.RuleSet,
   payload: '',
   action: RuleAction.Route,
   server: ''
@@ -437,37 +437,37 @@ export const DefaultDnsRule = (): IDNSRule => ({
 
 export const DefaultDnsRules = (): IDNSRule[] => [
   {
-    id: '1',
+    id: sampleID(),
     type: RuleType.Outbound,
     payload: 'any',
     action: RuleAction.Route,
     server: DefaultDnsServersIds.LocalDns
   },
   {
-    id: '2',
+    id: sampleID(),
     type: RuleType.ClashMode,
     payload: ClashMode.Direct,
     action: RuleAction.Route,
     server: DefaultDnsServersIds.LocalDns
   },
   {
-    id: '3',
+    id: sampleID(),
     type: RuleType.ClashMode,
     payload: ClashMode.Global,
     action: RuleAction.Route,
     server: DefaultDnsServersIds.RemoteDns
   },
   {
-    id: '4',
+    id: sampleID(),
     type: RuleType.RuleSet,
-    payload: 'GEOSITE-CN',
+    payload: DefaultRulesetIds.GEOSITE_CN,
     action: RuleAction.Route,
     server: DefaultDnsServersIds.LocalDns
   },
   {
-    id: '5',
+    id: sampleID(),
     type: RuleType.RuleSet,
-    payload: 'GEOLOCATION-!CN',
+    payload: DefaultRulesetIds.GEOLOCATION_NOT_CN,
     action: RuleAction.Route,
     server: DefaultDnsServersIds.RemoteDns
   }
@@ -485,8 +485,8 @@ export const DefaultDns = (): IDNS => ({
   disable_expire: false,
   independent_cache: false,
   client_subnet: '',
-  final: 'remote-dns',
-  strategy: 'ipv4_only'
+  final: DefaultDnsServersIds.RemoteDns,
+  strategy: Strategy.Default
 })
 
 export const DefaultMixin = (): IProfile['mixin'] => {

@@ -226,6 +226,7 @@ export const generateConfig = async (originalProfile: IProfile) => {
 export const generateConfigFile = async (profile: IProfile) => {
   const config = await generateConfig(profile)
 
+  config.log.disabled = false
   config.log.level = 'debug'
 
   await Writefile(CoreConfigFilePath, JSON.stringify(config, null, 2))
