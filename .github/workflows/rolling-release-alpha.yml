@@ -46,6 +46,11 @@ jobs:
           if [ $? -ne 0 ]; then
             echo "No changes found since last commit." >> changelog.md
           fi
+          echo -e "- 重写了配置界面\n" >> changelog.md
+          echo -e "- 配置界面完全遵循 sing-box 配置文件格式\n" >> changelog.md
+          echo -e "- 现在开始，以 sing-box 的方式使用 GUI！\n" >> changelog.md
+          echo -e "此版本为内测版，使用前请先备份并移除`data/profiles.yaml`文件，全新使用。\n" >> changelog.md
+          echo -e "若要恢复到稳定版，请执行【滚动发行插件】,并恢复原有的`data/profiles.yaml`文件\n" >> changelog.md
           set -e
       - name: Create Release and Upload Assets
         uses: svenstaro/upload-release-action@v2
