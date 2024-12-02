@@ -4,7 +4,7 @@ import { defineStore } from 'pinia'
 import { ProcessInfo, KillProcess, ExecBackground } from '@/bridge'
 import { CoreWorkingDirectory } from '@/constant/kernel'
 import { generateConfigFile, ignoredError, updateTrayMenus, getKernelFileName } from '@/utils'
-import { getProxies, getProviders, getConfigs } from '@/api/kernel'
+import { getProxies, getProviders, getConfigs, setConfigs } from '@/api/kernel'
 import { useAppSettingsStore, useProfilesStore, useLogsStore, useEnvStore } from '@/stores'
 
 export type ProxyType = 'mixed' | 'http' | 'socks'
@@ -18,7 +18,6 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
     'interface-name': '',
     'allow-lan': false,
     mode: '',
-    fakeip: false,
     tun: {
       enable: false,
       stack: 'System',
@@ -35,18 +34,25 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
   }>({})
 
   const refreshConfig = async () => {
-    config.value = await getConfigs()
-    if (!config.value.tun) {
-      config.value.tun = {
-        enable: false,
-        stack: 'System',
-        device: ''
-      }
+    const _config = await getConfigs()
+    config.value = {
+      ..._config,
+      tun: config.value.tun
+    }
+
+    const profilesStore = useProfilesStore()
+    const appSettingsStore = useAppSettingsStore()
+    const { profile: profileID } = appSettingsStore.app.kernel
+    const profile = profilesStore.getProfileById(profileID)
+    if (profile) {
+      const mixed = profile.inbounds.find((v) => v.mixed)?.mixed?.listen.listen_port || 0
+      config.value['mixed-port'] = mixed
     }
   }
 
-  const updateConfig = async (field: string, value: any) => {
-    console.log(field, value)
+  const updateConfig = async (options: Recordable) => {
+    await setConfigs(options)
+    await refreshConfig()
   }
 
   const refreshProviderProxies = async () => {

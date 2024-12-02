@@ -72,7 +72,7 @@ const onMouseWheel = (e: WheelEvent) => {
 
 const onTunSwitchChange = async (enable: boolean) => {
   try {
-    await kernelApiStore.updateConfig('tun', enable)
+    await kernelApiStore.updateConfig({ tun: { enable } })
   } catch (error: any) {
     console.error(error)
     message.error(error)
@@ -152,6 +152,7 @@ watch(showController, (v) => {
             {{ t('home.overview.systemProxy') }}
           </Switch>
           <Switch
+            v-if="false"
             v-model="kernelApiStore.config.tun.enable"
             @change="onTunSwitchChange"
             size="small"

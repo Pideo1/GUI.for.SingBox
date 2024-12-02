@@ -5,7 +5,6 @@ interface IKernelApiConfig {
   'interface-name': string
   'allow-lan': boolean
   mode: string
-  fakeip: boolean
   tun: {
     enable: boolean
     stack: string

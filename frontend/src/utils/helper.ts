@@ -350,7 +350,7 @@ export const handleChangeMode = async (mode: 'direct' | 'global' | 'rule') => {
 
   if (mode === kernelApiStore.config.mode) return
 
-  // kernelApiStore.updateConfig('mode', mode)
+  kernelApiStore.updateConfig({ mode })
 
   const { connections } = await getConnections()
   const promises = (connections || []).map((v) => deleteConnection(v.id))
