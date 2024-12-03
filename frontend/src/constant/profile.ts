@@ -31,7 +31,9 @@ const DefaultRulesetIds = {
   CATEGORY_ADS: 'CATEGORY-ADS',
   GEOIP_CN: 'GEOIP-CN',
   GEOSITE_CN: 'GEOSITE-CN',
-  GEOLOCATION_NOT_CN: 'GEOLOCATION-!CN'
+  GEOLOCATION_NOT_CN: 'GEOLOCATION-!CN',
+  GEOSITE_PRIVATE: 'GEOSITE_PRIVATE',
+  GEOIP_PRIVATE: 'GEOIP_PRIVATE'
 }
 
 const DefaultDnsServersIds = {
@@ -317,6 +319,29 @@ export const DefaultRoute = (): IRoute => ({
       strategy: Strategy.Default,
       server: ''
     },
+
+    {
+      id: sampleID(),
+      type: RuleType.RuleSet,
+      payload: DefaultRulesetIds.GEOSITE_PRIVATE,
+      invert: false,
+      action: RuleAction.Route,
+      outbound: DefaultOutboundIds.Direct,
+      sniffer: [],
+      strategy: Strategy.Default,
+      server: ''
+    },
+    {
+      id: sampleID(),
+      type: RuleType.RuleSet,
+      payload: DefaultRulesetIds.GEOIP_PRIVATE,
+      invert: false,
+      action: RuleAction.Route,
+      outbound: DefaultOutboundIds.Direct,
+      sniffer: [],
+      strategy: Strategy.Default,
+      server: ''
+    },
     {
       id: sampleID(),
       type: RuleType.RuleSet,
@@ -344,7 +369,7 @@ export const DefaultRoute = (): IRoute => ({
     {
       id: DefaultRulesetIds.CATEGORY_ADS,
       type: RulesetType.Remote,
-      tag: 'CATEGORY-ADS',
+      tag: DefaultRulesetIds.CATEGORY_ADS,
       format: RulesetFormat.Binary,
       url: 'https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/category-ads-all.srs',
       download_detour: DefaultOutboundIds.Direct,
@@ -353,9 +378,31 @@ export const DefaultRoute = (): IRoute => ({
       path: ''
     },
     {
+      id: DefaultRulesetIds.GEOSITE_PRIVATE,
+      type: RulesetType.Remote,
+      tag: DefaultRulesetIds.GEOSITE_PRIVATE,
+      format: RulesetFormat.Binary,
+      url: 'https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/private.srs',
+      download_detour: DefaultOutboundIds.Direct,
+      update_interval: '',
+      rules: '',
+      path: ''
+    },
+    {
+      id: DefaultRulesetIds.GEOIP_PRIVATE,
+      type: RulesetType.Remote,
+      tag: DefaultRulesetIds.GEOIP_PRIVATE,
+      format: RulesetFormat.Binary,
+      url: 'https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip/private.srs',
+      download_detour: DefaultOutboundIds.Direct,
+      update_interval: '',
+      rules: '',
+      path: ''
+    },
+    {
       id: DefaultRulesetIds.GEOIP_CN,
       type: RulesetType.Remote,
-      tag: 'GEOIP-CN',
+      tag: DefaultRulesetIds.GEOIP_CN,
       format: RulesetFormat.Binary,
       url: 'https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip/cn.srs',
       download_detour: DefaultOutboundIds.Direct,
@@ -366,7 +413,7 @@ export const DefaultRoute = (): IRoute => ({
     {
       id: DefaultRulesetIds.GEOSITE_CN,
       type: RulesetType.Remote,
-      tag: 'GEOSITE-CN',
+      tag: DefaultRulesetIds.GEOSITE_CN,
       format: RulesetFormat.Binary,
       url: 'https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/cn.srs',
       download_detour: DefaultOutboundIds.Direct,
@@ -377,7 +424,7 @@ export const DefaultRoute = (): IRoute => ({
     {
       id: DefaultRulesetIds.GEOLOCATION_NOT_CN,
       type: RulesetType.Remote,
-      tag: 'GEOLOCATION-!CN',
+      tag: DefaultRulesetIds.GEOLOCATION_NOT_CN,
       format: RulesetFormat.Binary,
       url: 'https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/geolocation-!cn.srs',
       download_detour: DefaultOutboundIds.Direct,
