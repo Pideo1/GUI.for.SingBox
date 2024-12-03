@@ -70,6 +70,28 @@ export const DefaultExperimental = (): IExperimental => ({
   }
 })
 
+export const DefaultInboundSocks = (): IInbound['socks'] => ({
+  listen: {
+    listen: '127.0.0.1',
+    listen_port: 20120,
+    tcp_fast_open: false,
+    tcp_multi_path: false,
+    udp_fragment: false
+  },
+  users: []
+})
+
+export const DefaultInboundHttp = (): IInbound['http'] => ({
+  listen: {
+    listen: '127.0.0.1',
+    listen_port: 20121,
+    tcp_fast_open: false,
+    tcp_multi_path: false,
+    udp_fragment: false
+  },
+  users: []
+})
+
 export const DefaultInboundMixed = (): IInbound['mixed'] => ({
   listen: {
     listen: '127.0.0.1',

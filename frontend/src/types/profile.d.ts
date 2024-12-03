@@ -51,7 +51,14 @@ interface IRuleSet {
   format: RuleSetFormat
 }
 
-type InboundType = 'direct' | 'mixed' | 'socks' | 'http' | 'tun'
+type InboundType = 'mixed' | 'socks' | 'http' | 'tun'
+type InboundListen = {
+  listen: string
+  listen_port: number
+  tcp_fast_open: boolean
+  tcp_multi_path: boolean
+  udp_fragment: boolean
+}
 
 interface IInbound {
   id: string
@@ -59,13 +66,15 @@ interface IInbound {
   tag: string
   enable: boolean
   mixed?: {
-    listen: {
-      listen: string
-      listen_port: number
-      tcp_fast_open: boolean
-      tcp_multi_path: boolean
-      udp_fragment: boolean
-    }
+    listen: InboundListen
+    users: string[]
+  }
+  socks?: {
+    listen: InboundListen
+    users: string[]
+  }
+  http?: {
+    listen: InboundListen
     users: string[]
   }
   tun?: {

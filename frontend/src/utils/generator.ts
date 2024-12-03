@@ -7,12 +7,12 @@ import { usePluginsStore, useRulesetsStore, useSubscribesStore } from '@/stores'
 const generateInbounds = (inbounds: IInbound[]) => {
   return inbounds.flatMap((inbound) => {
     if (!inbound.enable) return []
-    if (inbound.type === Inbound.Mixed) {
+    if (inbound.type !== Inbound.Tun) {
       return {
         type: inbound.type,
         tag: inbound.tag,
-        ...inbound.mixed!.listen,
-        users: inbound.mixed!.users.map((user) => ({
+        ...inbound[inbound.type]!.listen,
+        users: inbound[inbound.type]!.users.map((user) => ({
           username: user.split(':')[0],
           password: user.split(':')[1]
         }))

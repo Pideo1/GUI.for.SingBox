@@ -6,7 +6,13 @@ import { usePicker } from '@/hooks'
 import { Inbound } from '@/enums/kernel'
 import { DraggableOptions } from '@/constant/app'
 import { TunStackOptions } from '@/constant/kernel'
-import { DefaultInbounds, DefaultInboundMixed, DefaultInboundTun } from '@/constant/profile'
+import {
+  DefaultInbounds,
+  DefaultInboundMixed,
+  DefaultInboundHttp,
+  DefaultInboundSocks,
+  DefaultInboundTun
+} from '@/constant/profile'
 
 const model = defineModel<IProfile['inbounds']>({
   default: DefaultInbounds()
@@ -26,9 +32,33 @@ const inbounds = [
       model.value.push({
         id: sampleID(),
         tag: 'mixed-in',
-        type: 'mixed',
+        type: Inbound.Mixed,
         enable: true,
         mixed: DefaultInboundMixed()
+      })
+    }
+  },
+  {
+    label: 'Http',
+    value: () => {
+      model.value.push({
+        id: sampleID(),
+        tag: 'http-in',
+        type: Inbound.Http,
+        enable: true,
+        http: DefaultInboundHttp()
+      })
+    }
+  },
+  {
+    label: 'Socks',
+    value: () => {
+      model.value.push({
+        id: sampleID(),
+        tag: 'socks-in',
+        type: Inbound.Socks,
+        enable: true,
+        socks: DefaultInboundSocks()
       })
     }
   },
@@ -38,7 +68,7 @@ const inbounds = [
       model.value.push({
         id: sampleID(),
         tag: 'tun-in',
-        type: 'tun',
+        type: Inbound.Tun,
         enable: true,
         tun: DefaultInboundTun()
       })
@@ -80,30 +110,30 @@ defineExpose({ handleAdd })
         {{ t('kernel.inbounds.tag') }}
         <Input v-model="inbound.tag" />
       </div>
-      <div v-if="inbound.type === Inbound.Mixed && inbound.mixed">
+      <div v-if="inbound.type !== Inbound.Tun && inbound[inbound.type]">
         <div class="form-item">
           {{ t('kernel.inbounds.listen.listen') }}
-          <Input v-model="inbound.mixed.listen.listen" />
+          <Input v-model="inbound[inbound.type]!.listen.listen" />
         </div>
         <div class="form-item">
           {{ t('kernel.inbounds.listen.listen_port') }}
-          <Input v-model="inbound.mixed.listen.listen_port" type="number" />
+          <Input v-model="inbound[inbound.type]!.listen.listen_port" type="number" />
         </div>
-        <div :class="{ 'flex-start': inbound.mixed.users.length }" class="form-item">
+        <div :class="{ 'flex-start': inbound[inbound.type]!.users.length }" class="form-item">
           {{ t('kernel.inbounds.users') }}
-          <InputList v-model="inbound.mixed.users" placeholder="user:password" />
+          <InputList v-model="inbound[inbound.type]!.users" placeholder="user:password" />
         </div>
         <div class="form-item">
           {{ t('kernel.inbounds.listen.tcp_fast_open') }}
-          <Switch v-model="inbound.mixed.listen.tcp_fast_open" />
+          <Switch v-model="inbound[inbound.type]!.listen.tcp_fast_open" />
         </div>
         <div class="form-item">
           {{ t('kernel.inbounds.listen.tcp_multi_path') }}
-          <Switch v-model="inbound.mixed.listen.tcp_multi_path" />
+          <Switch v-model="inbound[inbound.type]!.listen.tcp_multi_path" />
         </div>
         <div class="form-item">
           {{ t('kernel.inbounds.listen.udp_fragment') }}
-          <Switch v-model="inbound.mixed.listen.udp_fragment" />
+          <Switch v-model="inbound[inbound.type]!.listen.udp_fragment" />
         </div>
       </div>
       <div v-else-if="inbound.type === Inbound.Tun && inbound.tun">
