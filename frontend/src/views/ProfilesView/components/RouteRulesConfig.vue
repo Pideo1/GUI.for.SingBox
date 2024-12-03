@@ -65,9 +65,7 @@ const handleDelete = (index: number) => {
 const showLost = () => message.warn('kernel.route.rules.notFound')
 
 const isSupportPayload = computed(() => {
-  const a = fields.value.action !== RuleAction.HijackDNS
-  const b = ![RuleType.RuleSet].includes(fields.value.type as any)
-  return a && b
+  return ![RuleType.RuleSet].includes(fields.value.type as any)
 })
 
 const hasLost = (rule: IRule) => {
@@ -206,6 +204,11 @@ const renderRule = (rule: IRule) => {
         editable
         lang="json"
         style="min-width: 320px"
+      />
+      <Switch
+        v-else-if="fields.type === RuleType.IpIsPrivate"
+        :model-value="fields.payload === 'true'"
+        @change="(val) => (fields.payload = val ? 'false' : 'true')"
       />
       <Input v-else v-model="fields.payload" />
     </div>

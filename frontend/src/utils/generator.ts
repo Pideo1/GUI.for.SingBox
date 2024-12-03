@@ -94,6 +94,8 @@ const generateRoute = (route: IRoute, inbounds: IInbound[], outbounds: IOutbound
         extra[rule.type] = getRuleset(rule.payload)
       } else if (rule.type === RuleType.Inbound) {
         extra[rule.type] = getInbound(rule.payload)
+      } else if (rule.type === RuleType.IpIsPrivate) {
+        extra[rule.type] = rule.payload === 'true'
       } else {
         extra[rule.type] = rule.payload
       }
