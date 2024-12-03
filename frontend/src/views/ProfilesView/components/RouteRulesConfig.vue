@@ -17,6 +17,7 @@ import {
 interface Props {
   inboundOptions: { label: string; value: string }[]
   outboundOptions: { label: string; value: string }[]
+  serverOptions: { label: string; value: string }[]
   ruleSet: IRuleSet[]
 }
 
@@ -150,10 +151,19 @@ const renderRule = (rule: IRule) => {
         <Select v-model="fields.outbound" :options="outboundOptions" />
       </div>
     </template>
+    <template v-else-if="fields.action === RuleAction.RouteOptions">
+      <div class="form-item">
+        {{ t('kernel.route.rules.routeOptions') }}
+        <CodeViewer v-model="fields.outbound" editable lang="json" style="min-width: 320px" />
+      </div>
+    </template>
     <template v-else-if="fields.action === RuleAction.Sniff">
       <div class="form-item">
         {{ t('kernel.route.rules.sniffer.name') }}
-        <CheckBox v-model="fields.sniffer" :options="RuleSnifferOptions" />
+        <div class="flex items-center">
+          <Switch :model-value="fields.sniffer.length === 0" disabled>All</Switch>
+          <CheckBox v-model="fields.sniffer" :options="RuleSnifferOptions" class="ml-4" />
+        </div>
       </div>
     </template>
     <template v-else-if="fields.action === RuleAction.Resolve">
@@ -163,7 +173,10 @@ const renderRule = (rule: IRule) => {
       </div>
       <div class="form-item">
         {{ t('kernel.route.rules.server') }}
-        <Select v-model="fields.server" :options="outboundOptions" />
+        <Select
+          v-model="fields.server"
+          :options="[{ label: 'kernel.strategy.byDnsRules', value: '' }, ...serverOptions]"
+        />
       </div>
     </template>
     <div v-if="isSupportPayload" class="form-item">

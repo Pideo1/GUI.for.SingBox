@@ -73,7 +73,8 @@ const generateOutbounds = async (outbounds: IOutbound[]) => {
   return result
 }
 
-const generateRoute = (route: IRoute, outbounds: IOutbound[], dns: IDNS) => {
+const generateRoute = (route: IRoute, inbounds: IInbound[], outbounds: IOutbound[], dns: IDNS) => {
+  const getInbound = (id: string) => inbounds.find((v) => v.id === id)?.tag
   const getOutbound = (id: string) => outbounds.find((v) => v.id === id)?.tag
   const getDnsServer = (id: string) => dns.servers.find((v) => v.id === id)?.tag
   const getRuleset = (id: string) => route.rule_set.find((v) => v.id === id)?.tag
@@ -91,11 +92,15 @@ const generateRoute = (route: IRoute, outbounds: IOutbound[], dns: IDNS) => {
         deepAssign(extra, JSON.parse(rule.payload))
       } else if (rule.type === RuleType.RuleSet) {
         extra[rule.type] = getRuleset(rule.payload)
+      } else if (rule.type === RuleType.Inbound) {
+        extra[rule.type] = getInbound(rule.payload)
       } else {
         extra[rule.type] = rule.payload
       }
       if (rule.action === RuleAction.Route) {
         extra.outbound = getOutbound(rule.outbound)
+      } else if (rule.action === RuleAction.RouteOptions) {
+        deepAssign(extra, JSON.parse(rule.outbound))
       } else if (rule.action === RuleAction.Sniff) {
         extra.sniffer = rule.sniffer
       } else if (rule.action === RuleAction.Resolve) {
@@ -196,7 +201,7 @@ export const generateConfig = async (originalProfile: IProfile) => {
     experimental: profile.experimental,
     inbounds: generateInbounds(profile.inbounds),
     outbounds: await generateOutbounds(profile.outbounds),
-    route: generateRoute(profile.route, profile.outbounds, profile.dns),
+    route: generateRoute(profile.route, profile.inbounds, profile.outbounds, profile.dns),
     dns: generateDns(profile.dns, profile.outbounds)
   }
 

@@ -242,27 +242,31 @@ const onSortUpdate = debounce(profilesStore.saveProfiles, 1000)
         </Button>
       </template>
       <div>
-        {{ t('profiles.proxyGroups') }}
+        {{ t('profiles.inbounds') }}
         :
-        <!-- {{ p.proxyGroupsConfig.length }} -->
+        {{ p.inbounds.length }}
         /
-        {{ t('profiles.rules') }}
+        {{ t('profiles.outbounds') }}
         :
-        <!-- {{ p.rulesConfig.length }} -->
+        {{ p.outbounds.length }}
       </div>
       <div>
-        TUN :
-        <!-- {{ p.tunConfig.enable ? t('common.enabled') : t('common.disabled') }} -->
-        / DNS :
-        <!-- {{ p.dnsConfig.enable ? t('common.enabled') : t('common.disabled') }} -->
+        {{ t('kernel.route.tab.rule_set') }}
+        :
+        {{ p.route.rule_set.length }}
+        /
+        {{ t('kernel.route.tab.rules') }}
+        :
+        {{ p.route.rules.length }}
       </div>
       <div>
-        Http :
-        <!-- {{ p.advancedConfig.port || '--' }} -->
-        Socks :
-        <!-- {{ p.advancedConfig['socks-port'] || '--' }} -->
-        Mixed :
-        <!-- {{ p.generalConfig['mixed-port'] || '--' }} -->
+        {{ t('profiles.dnsServers') }}
+        :
+        {{ p.dns.servers.length }}
+        /
+        {{ t('profiles.dnsRules') }}
+        :
+        {{ p.dns.rules.length }}
       </div>
     </Card>
   </div>

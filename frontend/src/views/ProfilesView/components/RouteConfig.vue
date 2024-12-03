@@ -9,6 +9,7 @@ import RouteRulesetConfig from './RouteRulesetConfig.vue'
 interface Props {
   inboundOptions: { label: string; value: string }[]
   outboundOptions: { label: string; value: string }[]
+  serverOptions: { label: string; value: string }[]
 }
 
 defineProps<Props>()
@@ -68,6 +69,7 @@ defineExpose({ handleAdd })
         v-model="model.rules"
         :inbound-options="inboundOptions"
         :outbound-options="outboundOptions"
+        :server-options="serverOptions"
         :rule-set="model.rule_set"
         ref="rulesConfigRef"
       />

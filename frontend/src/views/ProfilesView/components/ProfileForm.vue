@@ -75,6 +75,10 @@ const outboundOptions = computed(() =>
   profile.value.outbounds.map((v) => ({ label: v.tag, value: v.id }))
 )
 
+const serverOptions = computed(() =>
+  profile.value.dns.servers.map((v) => ({ label: v.tag, value: v.id }))
+)
+
 const generalConfig = computed({
   get() {
     return { log: profile.value.log, experimental: profile.value.experimental }
@@ -185,6 +189,7 @@ if (props.isUpdate) {
         v-model="profile.route"
         :inbound-options="inboundOptions"
         :outbound-options="outboundOptions"
+        :server-options="serverOptions"
         ref="routeRef"
       />
     </div>

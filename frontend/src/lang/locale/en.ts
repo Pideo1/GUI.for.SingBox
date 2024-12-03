@@ -173,6 +173,7 @@ export default {
           resolve: 'Resolve DNS'
         },
         outbound: 'Outbound Tag',
+        routeOptions: 'Route Options',
         sniffer: {
           name: 'Sniffer',
           http: 'http',
@@ -215,6 +216,7 @@ export default {
     strategy: {
       name: 'Strategy',
       default: 'Default',
+      byDnsRules: 'Decided by DNS rules',
       prefer_ipv4: 'Prefer IPV4',
       prefer_ipv6: 'Prefer IPV6',
       ipv4_only: 'IPV4 Only',
@@ -408,8 +410,10 @@ export default {
     generateAndView: 'Generate and View',
     copy: 'Copy and Paste',
     start: 'Start/Restart with this Profile',
-    proxyGroups: 'Proxy Groups',
-    rules: 'Rules'
+    inbounds: 'Inbounds',
+    outbounds: 'Outbounds',
+    dnsServers: 'DNS Servers',
+    dnsRules: 'DNS Rules'
   },
   ruleset: {
     manual: 'MANUAL',

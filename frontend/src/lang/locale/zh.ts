@@ -174,6 +174,7 @@ export default {
           resolve: '解析DNS'
         },
         outbound: '出站标签',
+        routeOptions: '路由选项',
         sniffer: {
           name: '启用的探测器',
           http: 'http',
@@ -217,6 +218,7 @@ export default {
     strategy: {
       name: '策略',
       default: '默认',
+      byDnsRules: '由DNS路由规则决定',
       prefer_ipv4: 'IPV4优先',
       prefer_ipv6: 'IPV6优先',
       ipv4_only: '只使用IPV4',
@@ -410,8 +412,10 @@ export default {
     generateAndView: '生成配置并查看',
     copy: '复制并粘贴',
     start: '使用此配置启动/重启',
-    proxyGroups: '策略组',
-    rules: '规则'
+    inbounds: '入站',
+    outbounds: '出站',
+    dnsServers: 'DNS服务器',
+    dnsRules: 'DNS规则'
   },
   ruleset: {
     manual: '手动管理',
