@@ -62,6 +62,7 @@ const hasLost = (ruleset: IRuleSet) => {
 const handleUse = (ruleset: any) => {
   fields.value.path = ruleset.id
   fields.value.tag = ruleset.tag
+  fields.value.format = ruleset.format
 }
 </script>
 
