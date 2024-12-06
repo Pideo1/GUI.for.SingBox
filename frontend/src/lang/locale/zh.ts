@@ -108,7 +108,11 @@ export default {
         system: 'System',
         gvisor: 'gVisor',
         mixed: 'Mixed'
-      }
+      },
+      mixedPort: '混合代理端口',
+      httpPort: 'HTTP(s)代理端口',
+      socksPort: 'SOCKS5代理端口',
+      allowLan: '允许局域网访问'
     },
     outbounds: {
       name: '出站',

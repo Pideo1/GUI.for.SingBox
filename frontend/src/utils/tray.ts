@@ -1,4 +1,5 @@
 import i18n from '@/lang'
+import { ClashMode } from '@/enums/kernel'
 import { Theme, Color, Lang } from '@/enums/app'
 import { useAppSettingsStore, useKernelApiStore, useEnvStore, usePluginsStore } from '@/stores'
 import {
@@ -80,7 +81,7 @@ const getTrayMenus = () => {
   const groupsMenus: MenuItem[] = (() => {
     if (!proxies) return []
     return Object.values(proxies)
-      .filter((v) => v.all && v.name !== 'GLOBAL')
+      .filter((v) => ['Selector', 'URLTest', 'Direct'].includes(v.type) && v.name !== 'GLOBAL')
       .concat(proxies.GLOBAL || [])
       .map((group) => {
         const all = group.all
@@ -173,20 +174,20 @@ const getTrayMenus = () => {
         {
           type: 'item',
           text: 'kernel.global',
-          checked: kernelApiStore.config.mode === 'global',
-          event: () => handleChangeMode('global')
+          checked: kernelApiStore.config.mode === ClashMode.Global,
+          event: () => handleChangeMode(ClashMode.Global)
         },
         {
           type: 'item',
           text: 'kernel.rule',
-          checked: kernelApiStore.config.mode === 'rule',
-          event: () => handleChangeMode('rule')
+          checked: kernelApiStore.config.mode === ClashMode.Rule,
+          event: () => handleChangeMode(ClashMode.Rule)
         },
         {
           type: 'item',
           text: 'kernel.direct',
-          checked: kernelApiStore.config.mode === 'direct',
-          event: () => handleChangeMode('direct')
+          checked: kernelApiStore.config.mode === ClashMode.Direct,
+          event: () => handleChangeMode(ClashMode.Direct)
         }
       ]
     },
@@ -233,9 +234,7 @@ const getTrayMenus = () => {
           type: 'item',
           text: 'tray.setSystemProxy',
           hidden: envStore.systemProxy,
-          event: async () => {
-            await envStore.setSystemProxy()
-          }
+          event: envStore.setSystemProxy
         },
         {
           type: 'item',
@@ -245,29 +244,25 @@ const getTrayMenus = () => {
         }
       ]
     },
-    // {
-    //   type: 'item',
-    //   text: 'tray.tun',
-    //   hidden: !appSettings.app.kernel.running,
-    //   children: [
-    //     {
-    //       type: 'item',
-    //       text: 'tray.enableTunMode',
-    //       hidden: kernelApiStore.config.tun.enable,
-    //       event: async () => {
-    //         await envStore.clearSystemProxy()
-    //       }
-    //     },
-    //     {
-    //       type: 'item',
-    //       text: 'tray.disableTunMode',
-    //       hidden: !kernelApiStore.config.tun.enable,
-    //       event: async () => {
-    //         await kernelApiStore.updateConfig('tun', false)
-    //       }
-    //     }
-    //   ]
-    // },
+    {
+      type: 'item',
+      text: 'tray.tun',
+      hidden: !appSettings.app.kernel.running,
+      children: [
+        {
+          type: 'item',
+          text: 'tray.enableTunMode',
+          hidden: kernelApiStore.config.tun.enable,
+          event: envStore.clearSystemProxy
+        },
+        {
+          type: 'item',
+          text: 'tray.disableTunMode',
+          hidden: !kernelApiStore.config.tun.enable,
+          event: () => kernelApiStore.updateConfig('tun', { enable: false })
+        }
+      ]
+    },
     {
       type: 'item',
       text: 'settings.general',

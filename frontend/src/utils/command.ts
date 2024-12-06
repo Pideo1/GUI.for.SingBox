@@ -2,6 +2,7 @@ import useI18n from '@/lang'
 import { Color, Lang, PluginTrigger, PluginTriggerEvent, Theme } from '@/enums/app'
 import { handleChangeMode } from '@/utils'
 import { useMessage } from '@/hooks'
+import { ClashMode } from '@/enums/kernel'
 import { ExitApp, RestartApp, WindowReloadApp } from '@/bridge'
 import {
   useAppSettingsStore,
@@ -70,29 +71,26 @@ export const getCommands = () => {
           cmd: 'Restart Kernel',
           handler: kernelStore.restartKernel
         },
-        // {
-        //   label: 'tray.enableTunMode',
-        //   cmd: 'Enable Tun',
-        //   handler: async () => {
-        //     await envStore.clearSystemProxy()
-        //     await kernelStore.updateConfig('tun', true)
-        //   }
-        // },
-        // {
-        //   label: 'tray.disableTunMode',
-        //   cmd: 'Disable Tun',
-        //   handler: () => kernelStore.updateConfig('tun', false)
-        // },
-        // {
-        //   label: 'kernel.allow-lan',
-        //   cmd: 'Allow Lan',
-        //   handler: () => kernelStore.updateConfig('allow-lan', true)
-        // },
-        // {
-        //   label: 'kernel.disallow-lan',
-        //   cmd: 'Disallow Lan',
-        //   handler: () => kernelStore.updateConfig('allow-lan', false)
-        // },
+        {
+          label: 'tray.enableTunMode',
+          cmd: 'Enable Tun',
+          handler: () => kernelStore.updateConfig('tun', { enable: true })
+        },
+        {
+          label: 'tray.disableTunMode',
+          cmd: 'Disable Tun',
+          handler: () => kernelStore.updateConfig('tun', { enable: false })
+        },
+        {
+          label: 'kernel.allow-lan',
+          cmd: 'Allow Lan',
+          handler: () => kernelStore.updateConfig('allow-lan', true)
+        },
+        {
+          label: 'kernel.disallow-lan',
+          cmd: 'Disallow Lan',
+          handler: () => kernelStore.updateConfig('allow-lan', false)
+        },
         {
           label: 'kernel.mode',
           cmd: 'Kernel Mode',
@@ -100,17 +98,17 @@ export const getCommands = () => {
             {
               label: 'kernel.global',
               cmd: 'Global',
-              handler: () => handleChangeMode('global')
+              handler: () => handleChangeMode(ClashMode.Global)
             },
             {
               label: 'kernel.rule',
               cmd: 'Rule',
-              handler: () => handleChangeMode('rule')
+              handler: () => handleChangeMode(ClashMode.Rule)
             },
             {
               label: 'kernel.direct',
               cmd: 'Direct',
-              handler: () => handleChangeMode('direct')
+              handler: () => handleChangeMode(ClashMode.Direct)
             }
           ]
         }
@@ -123,9 +121,7 @@ export const getCommands = () => {
         {
           label: 'tray.setSystemProxy',
           cmd: 'Set System Proxy',
-          handler: async () => {
-            await envStore.setSystemProxy()
-          }
+          handler: envStore.setSystemProxy
         },
         {
           label: 'tray.clearSystemProxy',

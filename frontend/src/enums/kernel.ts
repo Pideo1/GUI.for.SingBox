@@ -29,7 +29,7 @@ export enum Outbound {
 
 export enum TunStack {
   System = 'system',
-  GVisor = 'gVisor',
+  GVisor = 'gvisor',
   Mixed = 'mixed'
 }
 

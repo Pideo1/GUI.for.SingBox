@@ -15,11 +15,11 @@ import i18n from '@/lang'
 const { t } = i18n.global
 
 const DefaultOutboundIds = {
-  Select: sampleID(),
-  Urltest: sampleID(),
-  Direct: sampleID(),
-  Fallback: sampleID(),
-  Global: sampleID()
+  Select: 'outbound-select',
+  Urltest: 'outbound-urlte',
+  Direct: 'outbound-direct',
+  Fallback: 'outbound-fallback',
+  Global: 'outbound-global'
 }
 
 const DefaultInboundIds = {

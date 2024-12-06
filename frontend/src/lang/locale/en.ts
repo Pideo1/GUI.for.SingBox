@@ -108,7 +108,11 @@ export default {
         system: 'System',
         gvisor: 'gVisor',
         mixed: 'Mixed'
-      }
+      },
+      mixedPort: 'Mixed Port',
+      httpPort: 'HTTP(s) Port',
+      socksPort: 'SOCKS5 Port',
+      allowLan: 'Allow LAN'
     },
     outbounds: {
       tag: 'Tag',

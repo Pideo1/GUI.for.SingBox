@@ -21,8 +21,6 @@ const kernelApiStore = useKernelApiStore()
 
 const groups = computed(() => {
   const { proxies } = kernelApiStore
-  console.log(proxies)
-
   return Object.values(proxies)
     .filter((v) => ['Selector', 'URLTest', 'Direct'].includes(v.type) && v.name !== 'GLOBAL')
     .concat(proxies.GLOBAL || [])

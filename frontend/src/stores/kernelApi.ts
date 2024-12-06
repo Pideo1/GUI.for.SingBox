@@ -1,15 +1,29 @@
 import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 
-import { ProcessInfo, KillProcess, ExecBackground } from '@/bridge'
-import { CoreWorkingDirectory } from '@/constant/kernel'
-import { generateConfigFile, ignoredError, updateTrayMenus, getKernelFileName } from '@/utils'
+import { DefaultInboundMixed, DefaultInboundTun } from '@/constant/profile'
+import { ProcessInfo, KillProcess, ExecBackground, Readfile } from '@/bridge'
+import { CoreConfigFilePath, CoreWorkingDirectory } from '@/constant/kernel'
 import { getProxies, getProviders, getConfigs, setConfigs } from '@/api/kernel'
 import { useAppSettingsStore, useProfilesStore, useLogsStore, useEnvStore } from '@/stores'
+import {
+  generateConfigFile,
+  ignoredError,
+  updateTrayMenus,
+  getKernelFileName,
+  restoreProfile,
+  deepClone
+} from '@/utils'
+import { Inbound, TunStack } from '@/enums/kernel'
 
 export type ProxyType = 'mixed' | 'http' | 'socks'
 
 export const useKernelApiStore = defineStore('kernelApi', () => {
+  const envStore = useEnvStore()
+  const logsStore = useLogsStore()
+  const profilesStore = useProfilesStore()
+  const appSettingsStore = useAppSettingsStore()
+
   /** RESTful API */
   const config = ref<IKernelApiConfig>({
     port: 0,
@@ -25,6 +39,8 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
     }
   })
 
+  let runtimeProfile: IProfile | null
+
   const proxies = ref<Record<string, IKernelProxy>>({})
   const providers = ref<{
     [key: string]: {
@@ -35,24 +51,135 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
 
   const refreshConfig = async () => {
     const _config = await getConfigs()
+
     config.value = {
       ..._config,
       tun: config.value.tun
     }
 
-    const profilesStore = useProfilesStore()
-    const appSettingsStore = useAppSettingsStore()
-    const { profile: profileID } = appSettingsStore.app.kernel
-    const profile = profilesStore.getProfileById(profileID)
-    if (profile) {
-      const mixed = profile.inbounds.find((v) => v.mixed)?.mixed?.listen.listen_port || 0
-      config.value['mixed-port'] = mixed
+    if (!runtimeProfile) {
+      const txt = await Readfile(CoreConfigFilePath)
+      runtimeProfile = restoreProfile(JSON.parse(txt))
     }
+
+    const mixed = runtimeProfile.inbounds.find((v) => v.mixed)
+    const http = runtimeProfile.inbounds.find((v) => v.http)
+    const socks = runtimeProfile.inbounds.find((v) => v.socks)
+    const tun = runtimeProfile.inbounds.find((v) => v.tun)
+    config.value['mixed-port'] = mixed?.mixed?.listen.listen_port || 0
+    config.value['port'] = http?.http?.listen.listen_port || 0
+    config.value['socks-port'] = socks?.socks?.listen.listen_port || 0
+    config.value['allow-lan'] =
+      mixed?.mixed?.listen.listen === '0.0.0.0' ||
+      http?.http?.listen.listen === '0.0.0.0' ||
+      socks?.socks?.listen.listen === '0.0.0.0'
+
+    config.value.tun.enable = !!tun?.enable
+    config.value.tun.device = tun?.tun?.interface_name || ''
+    config.value.tun.stack = tun?.tun?.stack || ''
+    config.value['interface-name'] = runtimeProfile.route.default_interface
   }
 
-  const updateConfig = async (options: Recordable) => {
-    await setConfigs(options)
+  const updateConfig = async (field: string, value: any) => {
+    if (field === 'mode') {
+      await setConfigs({ mode: value })
+      await refreshConfig()
+      return
+    }
+
+    const patchInboundPort = (type: 'mixed' | 'socks' | 'http', port: number) => {
+      if (!runtimeProfile) return
+      let inbound = runtimeProfile.inbounds.find((v) => v.type === type)
+      if (inbound) {
+        inbound[type]!.listen.listen_port = port
+      } else {
+        const _type = DefaultInboundMixed()!
+        _type.listen.listen_port = port
+        inbound = {
+          id: type + '-in',
+          tag: type + '-in',
+          type: type,
+          enable: true,
+          [type]: _type
+        }
+        runtimeProfile.inbounds.push(inbound)
+      }
+      inbound.enable = port !== 0
+    }
+
+    const patchInboundAddress = (allowLan: boolean) => {
+      if (!runtimeProfile) return
+      runtimeProfile.inbounds.forEach((inbound) => {
+        if (inbound.type === Inbound.Tun) return
+        inbound[inbound.type]!.listen.listen = allowLan ? '0.0.0.0' : '127.0.0.1'
+      })
+    }
+
+    const patchInboundTun = (options: {
+      enable: boolean
+      stack: string
+      device: string
+      interface_name: string
+    }) => {
+      if (!runtimeProfile) return
+      options = { ...config.value.tun, ...options }
+      let inbound = runtimeProfile.inbounds.find((v) => v.type === Inbound.Tun)
+      if (!inbound) {
+        inbound = {
+          id: 'tun-in',
+          tag: 'tun-in',
+          type: Inbound.Tun,
+          enable: false,
+          tun: DefaultInboundTun()
+        }
+        runtimeProfile.inbounds.push(inbound)
+      }
+      inbound.enable = options.enable
+      inbound.tun!.stack = options.stack || TunStack.Mixed
+      inbound.tun!.interface_name = options.device || ''
+      if (options.interface_name) {
+        runtimeProfile.route.default_interface = options.interface_name
+      }
+      runtimeProfile.route.auto_detect_interface = !options.interface_name
+    }
+
+    const reloadRuntimeProfile = async () => {
+      if (!runtimeProfile) return
+      const profile = profilesStore.getProfileById(appSettingsStore.app.kernel.profile)
+      if (profile) {
+        const _profile = deepClone(profile)
+        runtimeProfile.inbounds.forEach((inbound) => {
+          const _in = _profile.inbounds.find((v) => v.tag === inbound.tag)
+          if (_in) {
+            inbound.id = _in.id
+          }
+        })
+        runtimeProfile.outbounds = _profile.outbounds
+        runtimeProfile.dns = _profile.dns
+        runtimeProfile.route.final = _profile.route.final
+        runtimeProfile.route.rule_set = _profile.route.rule_set
+        runtimeProfile.route.rules = _profile.route.rules
+      }
+      await stopKernel()
+      await startKernel(runtimeProfile)
+    }
+
+    const fieldHandlerMap: Recordable<() => void> = {
+      http: () => patchInboundPort(Inbound.Http, value),
+      socks: () => patchInboundPort(Inbound.Socks, value),
+      mixed: () => patchInboundPort(Inbound.Mixed, value),
+      'allow-lan': () => patchInboundAddress(value),
+      tun: () => patchInboundTun(value),
+      'tun-stack': () => patchInboundTun(value),
+      'tun-device': () => patchInboundTun(value),
+      'interface-name': () => patchInboundTun(value)
+    }
+
+    fieldHandlerMap[field]?.()
+
+    await reloadRuntimeProfile()
     await refreshConfig()
+    await envStore.updateSystemProxyStatus()
   }
 
   const refreshProviderProxies = async () => {
@@ -70,9 +197,6 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
   }
 
   const updateKernelState = async () => {
-    const envStore = useEnvStore()
-    const appSettingsStore = useAppSettingsStore()
-
     appSettingsStore.app.kernel.running = !!(await ignoredError(
       isKernelRunning,
       appSettingsStore.app.kernel.pid
@@ -93,22 +217,17 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
     }
   }
 
-  const startKernel = async () => {
-    const envStore = useEnvStore()
-    const logsStore = useLogsStore()
-    const profilesStore = useProfilesStore()
-    const appSettingsStore = useAppSettingsStore()
-
+  const startKernel = async (_profile?: IProfile) => {
     const { profile: profileID, branch } = appSettingsStore.app.kernel
-
-    if (!profileID) throw 'Choose a profile first'
-
-    const profile = profilesStore.getProfileById(profileID)
-
-    if (!profile) throw 'Profile does not exist: ' + profileID
+    const profile = _profile || profilesStore.getProfileById(profileID)
+    if (!profile) throw 'Choose a profile first'
 
     await stopKernel()
-    await generateConfigFile(profile)
+    await generateConfigFile(profile || _profile)
+
+    if (!_profile) {
+      runtimeProfile = null
+    }
 
     const fileName = await getKernelFileName(branch === 'latest')
     const kernelFilePath = CoreWorkingDirectory + '/' + fileName
@@ -157,10 +276,6 @@ export const useKernelApiStore = defineStore('kernelApi', () => {
   }
 
   const stopKernel = async () => {
-    const envStore = useEnvStore()
-    const logsStore = useLogsStore()
-    const appSettingsStore = useAppSettingsStore()
-
     const { pid } = appSettingsStore.app.kernel
     const running = await ignoredError(isKernelRunning, pid)
     running && (await KillProcess(pid))
