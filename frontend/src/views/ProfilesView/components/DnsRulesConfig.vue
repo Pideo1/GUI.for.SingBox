@@ -10,6 +10,8 @@ import { DnsRuleTypeOptions, DnsRuleActionOptions } from '@/constant/kernel'
 import { RuleType, ClashMode, RulesetType, RulesetFormat } from '@/enums/kernel'
 
 interface Props {
+  inboundOptions: { label: string; value: string }[]
+  outboundOptions: { label: string; value: string }[]
   serversOptions: { label: string; value: string }[]
   ruleSet: IRuleSet[]
 }
@@ -109,15 +111,8 @@ const renderRule = (rule: IDNSRule) => {
     </div>
     <div v-if="fields.type !== RuleType.RuleSet" class="form-item">
       {{ t('kernel.dns.rules.payload') }}
-      <CodeViewer
-        v-if="fields.type === RuleType.Inline"
-        v-model="fields.payload"
-        editable
-        lang="json"
-        style="min-width: 220px"
-      />
       <Radio
-        v-else-if="fields.type === RuleType.ClashMode"
+        v-if="fields.type === RuleType.ClashMode"
         v-model="fields.payload"
         :options="[
           {
@@ -129,6 +124,28 @@ const renderRule = (rule: IDNSRule) => {
             value: ClashMode.Direct
           }
         ]"
+      />
+      <Select
+        v-else-if="fields.type === RuleType.Inbound"
+        v-model="fields.payload"
+        :options="inboundOptions"
+      />
+      <Select
+        v-else-if="fields.type === RuleType.Outbound"
+        v-model="fields.payload"
+        :options="outboundOptions"
+      />
+      <CodeViewer
+        v-else-if="fields.type === RuleType.Inline"
+        v-model="fields.payload"
+        editable
+        lang="json"
+        style="min-width: 320px"
+      />
+      <Switch
+        v-else-if="fields.type === RuleType.IpIsPrivate"
+        :model-value="fields.payload === 'true'"
+        @change="(val) => (fields.payload = val ? 'false' : 'true')"
       />
       <Input v-else v-model="fields.payload" autofocus />
     </div>

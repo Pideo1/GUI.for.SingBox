@@ -84,7 +84,7 @@ const getTrayMenus = () => {
       .filter((v) => ['Selector', 'URLTest', 'Direct'].includes(v.type) && v.name !== 'GLOBAL')
       .concat(proxies.GLOBAL || [])
       .map((group) => {
-        const all = group.all
+        const all = (group.all || [])
           .filter((proxy) => {
             const history = proxies[proxy].history || []
             const alive = history[history.length - 1]?.delay > 0

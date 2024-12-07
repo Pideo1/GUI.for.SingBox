@@ -210,7 +210,7 @@ const renderRule = (rule: IRule) => {
         :model-value="fields.payload === 'true'"
         @change="(val) => (fields.payload = val ? 'false' : 'true')"
       />
-      <Input v-else v-model="fields.payload" />
+      <Input v-else v-model="fields.payload" autofocus />
     </div>
 
     <template v-if="fields.type === RuleType.RuleSet">

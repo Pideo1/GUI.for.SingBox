@@ -4,6 +4,34 @@ import { deepAssign, deepClone } from './others'
 import { Inbound, Outbound, RuleAction, RulesetType, RuleType, Strategy } from '@/enums/kernel'
 import { usePluginsStore, useRulesetsStore, useSubscribesStore } from '@/stores'
 
+const _generateRule = (rule: IRule, rule_set: IRuleSet[], inbounds: IInbound[]) => {
+  const getInbound = (id: string) => inbounds.find((v) => v.id === id)?.tag
+  const getRuleset = (id: string) => rule_set.find((v) => v.id === id)?.tag
+
+  const extra: Recordable = {}
+  if (rule.type === RuleType.Inline) {
+    deepAssign(extra, JSON.parse(rule.payload))
+  } else if (rule.type === RuleType.RuleSet) {
+    extra[rule.type] = getRuleset(rule.payload)
+  } else if (rule.type === RuleType.Inbound) {
+    extra[rule.type] = getInbound(rule.payload)
+  } else if (rule.type === RuleType.IpIsPrivate) {
+    extra[rule.type] = rule.payload === 'true'
+  } else if (rule.type === RuleType.ClashMode) {
+    extra[rule.type] = rule.payload
+  } else {
+    extra[rule.type] = String(rule.payload)
+      .split(',')
+      .map((val) => {
+        if ([RuleType.Port, RuleType.SourcePort].includes(rule.type as any)) {
+          return Number(val)
+        }
+        return val
+      })
+  }
+  return extra
+}
+
 const generateInbounds = (inbounds: IInbound[]) => {
   return inbounds.flatMap((inbound) => {
     if (!inbound.enable) return []
@@ -74,10 +102,8 @@ const generateOutbounds = async (outbounds: IOutbound[]) => {
 }
 
 const generateRoute = (route: IRoute, inbounds: IInbound[], outbounds: IOutbound[], dns: IDNS) => {
-  const getInbound = (id: string) => inbounds.find((v) => v.id === id)?.tag
   const getOutbound = (id: string) => outbounds.find((v) => v.id === id)?.tag
   const getDnsServer = (id: string) => dns.servers.find((v) => v.id === id)?.tag
-  const getRuleset = (id: string) => route.rule_set.find((v) => v.id === id)?.tag
 
   const rulesetsStore = useRulesetsStore()
 
@@ -87,24 +113,16 @@ const generateRoute = (route: IRoute, inbounds: IInbound[], outbounds: IOutbound
   }
   return {
     rules: route.rules.map((rule) => {
-      const extra: Recordable = {}
-      if (rule.type === RuleType.Inline) {
-        deepAssign(extra, JSON.parse(rule.payload))
-      } else if (rule.type === RuleType.RuleSet) {
-        extra[rule.type] = getRuleset(rule.payload)
-      } else if (rule.type === RuleType.Inbound) {
-        extra[rule.type] = getInbound(rule.payload)
-      } else if (rule.type === RuleType.IpIsPrivate) {
-        extra[rule.type] = rule.payload === 'true'
-      } else {
-        extra[rule.type] = rule.payload
-      }
+      const extra: Recordable = _generateRule(rule, route.rule_set, inbounds)
+
       if (rule.action === RuleAction.Route) {
         extra.outbound = getOutbound(rule.outbound)
       } else if (rule.action === RuleAction.RouteOptions) {
         deepAssign(extra, JSON.parse(rule.outbound))
       } else if (rule.action === RuleAction.Sniff) {
-        extra.sniffer = rule.sniffer
+        if (rule.sniffer.length) {
+          extra.sniffer = rule.sniffer
+        }
       } else if (rule.action === RuleAction.Resolve) {
         if (rule.strategy !== Strategy.Default) {
           extra.strategy = rule.strategy
@@ -146,7 +164,12 @@ const generateRoute = (route: IRoute, inbounds: IInbound[], outbounds: IOutbound
   }
 }
 
-const generateDns = (dns: IDNS, outbounds: IOutbound[]) => {
+const generateDns = (
+  dns: IDNS,
+  rule_set: IRuleSet[],
+  inbounds: IInbound[],
+  outbounds: IOutbound[]
+) => {
   const getOutbound = (id: string) => outbounds.find((v) => v.id === id)?.tag
   const getDnsServer = (id: string) => dns.servers.find((v) => v.id === id)?.tag
   const extra: Recordable = {}
@@ -174,12 +197,7 @@ const generateDns = (dns: IDNS, outbounds: IOutbound[]) => {
       }
     }),
     rules: dns.rules.map((rule) => {
-      const extra: Recordable = {}
-      if (rule.type === RuleType.Inline) {
-        deepAssign(extra, JSON.parse(rule.payload))
-      } else {
-        extra[rule.type] = rule.payload
-      }
+      const extra: Recordable = _generateRule(rule as IRule, rule_set, inbounds)
       return {
         action: rule.action,
         server: getDnsServer(rule.server),
@@ -204,7 +222,7 @@ export const generateConfig = async (originalProfile: IProfile) => {
     inbounds: generateInbounds(profile.inbounds),
     outbounds: await generateOutbounds(profile.outbounds),
     route: generateRoute(profile.route, profile.inbounds, profile.outbounds, profile.dns),
-    dns: generateDns(profile.dns, profile.outbounds)
+    dns: generateDns(profile.dns, profile.route.rule_set, profile.inbounds, profile.outbounds)
   }
 
   // step 2
