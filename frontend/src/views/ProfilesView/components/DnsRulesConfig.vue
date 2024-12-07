@@ -6,8 +6,12 @@ import { useBool } from '@/hooks'
 import { deepClone } from '@/utils'
 import { DraggableOptions } from '@/constant/app'
 import { DefaultDnsRule, DefaultDnsRules } from '@/constant/profile'
-import { DnsRuleTypeOptions, DnsRuleActionOptions } from '@/constant/kernel'
-import { RuleType, ClashMode, RulesetType, RulesetFormat } from '@/enums/kernel'
+import { RuleType, ClashMode, RulesetType, RulesetFormat, RuleAction } from '@/enums/kernel'
+import {
+  DnsRuleTypeOptions,
+  DnsRuleActionOptions,
+  DnsRuleActionRejectOptions
+} from '@/constant/kernel'
 
 interface Props {
   inboundOptions: { label: string; value: string }[]
@@ -102,12 +106,12 @@ const renderRule = (rule: IDNSRule) => {
     max-height="80"
   >
     <div class="form-item">
-      {{ t('kernel.dns.rules.action') }}
-      <Select v-model="fields.action" :options="DnsRuleActionOptions" />
-    </div>
-    <div class="form-item">
       {{ t('kernel.dns.rules.type') }}
       <Select v-model="fields.type" :options="DnsRuleTypeOptions" />
+    </div>
+    <div class="form-item">
+      {{ t('kernel.dns.rules.action') }}
+      <Radio v-model="fields.action" :options="DnsRuleActionOptions" />
     </div>
     <div v-if="fields.type !== RuleType.RuleSet" class="form-item">
       {{ t('kernel.dns.rules.payload') }}
@@ -133,7 +137,7 @@ const renderRule = (rule: IDNSRule) => {
       <Select
         v-else-if="fields.type === RuleType.Outbound"
         v-model="fields.payload"
-        :options="outboundOptions"
+        :options="[{ label: 'any', value: 'any' }, ...outboundOptions]"
       />
       <CodeViewer
         v-else-if="fields.type === RuleType.Inline"
@@ -149,10 +153,24 @@ const renderRule = (rule: IDNSRule) => {
       />
       <Input v-else v-model="fields.payload" autofocus />
     </div>
-    <div class="form-item">
-      {{ t('kernel.dns.rules.server') }}
-      <Select v-model="fields.server" :options="serversOptions" />
-    </div>
+    <template v-if="fields.action === RuleAction.Route">
+      <div class="form-item">
+        {{ t('kernel.dns.rules.server') }}
+        <Select v-model="fields.server" :options="serversOptions" />
+      </div>
+    </template>
+    <template v-else-if="fields.action === RuleAction.RouteOptions">
+      <div class="form-item">
+        {{ t('kernel.route.rules.routeOptions') }}
+        <CodeViewer v-model="fields.server" editable lang="json" style="min-width: 320px" />
+      </div>
+    </template>
+    <template v-else-if="fields.action === RuleAction.Reject">
+      <div class="form-item">
+        {{ t('kernel.route.rules.action.rejectMethod') }}
+        <Radio v-model="fields.server" :options="DnsRuleActionRejectOptions" />
+      </div>
+    </template>
     <template v-if="fields.type === RuleType.RuleSet">
       <Divider>{{ t('kernel.route.tab.rule_set') }}</Divider>
       <div class="rulesets">

@@ -28,6 +28,9 @@ const _generateRule = (rule: IRule, rule_set: IRuleSet[], inbounds: IInbound[]) 
         }
         return val
       })
+    if (extra[rule.type].length === 1) {
+      extra[rule.type] = extra[rule.type][0]
+    }
   }
   return extra
 }
@@ -198,6 +201,11 @@ const generateDns = (
     }),
     rules: dns.rules.map((rule) => {
       const extra: Recordable = _generateRule(rule as IRule, rule_set, inbounds)
+      if (rule.action === RuleAction.RouteOptions) {
+        deepAssign(extra, JSON.parse(rule.server))
+      } else if (rule.action === RuleAction.Reject) {
+        extra.method = rule.server
+      }
       return {
         action: rule.action,
         server: getDnsServer(rule.server),

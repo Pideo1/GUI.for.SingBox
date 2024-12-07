@@ -9,7 +9,8 @@ import {
   RulesetType,
   RuleAction,
   Sniffer,
-  Strategy
+  Strategy,
+  RuleActionReject
 } from '@/enums/kernel'
 
 export const CoreWorkingDirectory = 'data/sing-box'
@@ -205,6 +206,11 @@ export const DnsRuleActionOptions = [
   { label: 'kernel.route.rules.action.route', value: RuleAction.Route },
   { label: 'kernel.route.rules.action.route-options', value: RuleAction.RouteOptions },
   { label: 'kernel.route.rules.action.reject', value: RuleAction.Reject }
+]
+
+export const DnsRuleActionRejectOptions = [
+  { label: 'kernel.route.rules.action.rejectDefault', value: RuleActionReject.Default },
+  { label: 'kernel.route.rules.action.rejectDrop', value: RuleActionReject.Drop }
 ]
 
 export const RuleSnifferOptions = [

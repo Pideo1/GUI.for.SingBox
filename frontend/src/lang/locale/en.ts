@@ -111,10 +111,10 @@ export default {
       },
       mixedPort: 'Mixed Port',
       httpPort: 'HTTP(s) Port',
-      socksPort: 'SOCKS5 Port',
-      allowLan: 'Allow LAN'
+      socksPort: 'SOCKS5 Port'
     },
     outbounds: {
+      name: 'Outbound',
       tag: 'Tag',
       type: 'Type',
       url: 'URL',
@@ -174,7 +174,10 @@ export default {
           reject: 'Reject',
           'hijack-dns': 'Hijack-DNS',
           sniff: 'Sniff',
-          resolve: 'Resolve DNS'
+          resolve: 'Resolve DNS',
+          rejectMethod: 'Method',
+          rejectDefault: 'NXDOMAIN',
+          rejectDrop: 'Drop'
         },
         outbound: 'Outbound Tag',
         routeOptions: 'Route Options',
@@ -214,7 +217,8 @@ export default {
         process_path_regex: 'process_path_regex',
         clash_mode: 'clash_mode',
         rule_set: 'rule_set',
-        outbound: 'outbound'
+        outbound: 'outbound',
+        inline: 'Inline'
       }
     },
     strategy: {
@@ -253,7 +257,10 @@ export default {
         action: 'Action',
         server: 'Server'
       }
-    }
+    },
+    mode: 'Mode',
+    'allow-lan': 'Allow LAN',
+    'disallow-lan': 'Disallow LAN'
   },
   router: {
     overview: 'OverView',

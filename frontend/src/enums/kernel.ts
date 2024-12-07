@@ -87,6 +87,11 @@ export enum RuleAction {
   Resolve = 'resolve'
 }
 
+export enum RuleActionReject {
+  Default = 'default',
+  Drop = 'drop'
+}
+
 export enum Sniffer {
   Http = 'http',
   Tls = 'tls',

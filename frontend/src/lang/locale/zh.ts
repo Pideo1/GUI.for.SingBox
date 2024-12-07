@@ -111,8 +111,7 @@ export default {
       },
       mixedPort: '混合代理端口',
       httpPort: 'HTTP(s)代理端口',
-      socksPort: 'SOCKS5代理端口',
-      allowLan: '允许局域网访问'
+      socksPort: 'SOCKS5代理端口'
     },
     outbounds: {
       name: '出站',
@@ -170,12 +169,15 @@ export default {
         type: '规则类型',
         action: {
           name: '规则动作',
-          route: '默认',
+          route: '路由',
           'route-options': '路由设置选项',
           reject: '拒绝连接',
           'hijack-dns': '劫持DNS请求',
           sniff: '协议嗅探',
-          resolve: '解析DNS'
+          resolve: '解析DNS',
+          rejectMethod: '拒绝方式',
+          rejectDefault: '返回NXDOMAIN',
+          rejectDrop: '丢弃请求'
         },
         outbound: '出站标签',
         routeOptions: '路由选项',
@@ -196,27 +198,27 @@ export default {
     rules: {
       type: {
         name: '类型',
-        inbound: 'inbound',
-        network: 'network',
-        protocol: 'protocol',
-        domain: 'domain',
-        domain_suffix: 'domain_suffix',
-        domain_keyword: 'domain_keyword',
-        domain_regex: 'domain_regex',
-        source_ip_cidr: 'source_ip_cidr',
-        ip_cidr: 'ip_cidr',
-        ip_is_private: 'ip_is_private',
-        source_port: 'source_port',
-        source_port_range: 'source_port_range',
-        port: 'port',
-        port_range: 'port_range',
-        process_name: 'process_name',
-        process_path: 'process_path',
-        process_path_regex: 'process_path_regex',
-        clash_mode: 'clash_mode',
-        rule_set: 'rule_set',
-        outbound: 'outbound',
-        inline: '内联'
+        inbound: '入站(inbound)',
+        network: '网络(network)',
+        protocol: '协议(protocol)',
+        domain: '域名(domain)',
+        domain_suffix: '域名后缀(domain_suffix)',
+        domain_keyword: '域名关键词(domain_keyword)',
+        domain_regex: '域名正则(domain_regex)',
+        source_ip_cidr: '源IP地址段(source_ip_cidr)',
+        ip_cidr: 'IP地址段(ip_cidr)',
+        ip_is_private: '是否为私有IP(ip_is_private)',
+        source_port: '源端口(source_port)',
+        source_port_range: '源端口范围(source_port_range)',
+        port: '端口(port)',
+        port_range: '端口范围(port_range)',
+        process_name: '进程名称(process_name)',
+        process_path: '进程路径(process_path)',
+        process_path_regex: '进程路径正则(process_path_regex)',
+        clash_mode: 'Clash模式(clash_mode)',
+        rule_set: '规则集(rule_set)',
+        outbound: '出站(outbound)',
+        inline: '内联(Inline)'
       }
     },
     strategy: {
@@ -251,11 +253,14 @@ export default {
       },
       rules: {
         type: '类型',
-        payload: '负载',
+        payload: '载荷',
         action: '规则动作',
         server: '目标DNS服务器的标签'
       }
-    }
+    },
+    mode: '工作模式',
+    'allow-lan': '允许局域网访问',
+    'disallow-lan': '禁止局域网访问'
   },
   router: {
     overview: '概览',
