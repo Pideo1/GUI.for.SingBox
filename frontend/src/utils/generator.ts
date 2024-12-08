@@ -142,14 +142,15 @@ const generateRoute = (route: IRoute, inbounds: IInbound[], outbounds: IOutbound
     }),
     rule_set: route.rule_set.map((ruleset) => {
       const extra: Recordable = {}
-      if (ruleset.type !== RulesetType.Inline) {
-        extra.format = ruleset.format
-      }
-      if (ruleset.type === RulesetType.Local) {
+      if (ruleset.type === RuleType.Inline) {
+        extra.rules = JSON.parse(ruleset.rules)
+      } else if (ruleset.type === RulesetType.Local) {
         const _ruleset = rulesetsStore.getRulesetById(ruleset.path)
         extra.path = _ruleset?.path.replace('data/', '../')
+        extra.format = ruleset.format
       } else if (ruleset.type === RulesetType.Remote) {
         extra.url = ruleset.url
+        extra.format = ruleset.format
         extra.download_detour = getOutbound(ruleset.download_detour)
         if (extra.update_interval) {
           extra.update_interval = ruleset.update_interval
