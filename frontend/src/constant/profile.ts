@@ -28,20 +28,20 @@ const DefaultInboundIds = {
 }
 
 const DefaultRulesetIds = {
-  CATEGORY_ADS: 'CATEGORY-ADS',
-  GEOIP_CN: 'GEOIP-CN',
-  GEOSITE_CN: 'GEOSITE-CN',
-  GEOLOCATION_NOT_CN: 'GEOLOCATION-!CN',
-  GEOSITE_PRIVATE: 'GEOSITE_PRIVATE',
-  GEOIP_PRIVATE: 'GEOIP_PRIVATE'
+  CATEGORY_ADS: 'Category-Ads',
+  GEOIP_CN: 'GeoIP-CN',
+  GEOSITE_CN: 'GeoSite-CN',
+  GEOLOCATION_NOT_CN: 'GeoLocation-!CN',
+  GEOSITE_PRIVATE: 'GeoSite-Private',
+  GEOIP_PRIVATE: 'GeoIP-Private'
 }
 
 const DefaultDnsServersIds = {
-  LocalDns: 'local-dns',
-  RemoteDns: 'remote-dns',
-  FakeIP: 'fake-ip',
-  LocalDnsResolver: 'local-dns-resolver',
-  RemoteDnsResolver: 'remote-dns-resolver'
+  LocalDns: 'Local-DNS',
+  RemoteDns: 'Remote-DNS',
+  FakeIP: 'Fake-IP',
+  LocalDnsResolver: 'Local-DNS-Resolver',
+  RemoteDnsResolver: 'Remote-DNS-Resolver'
 }
 
 export const DefaultLog = (): ILog => ({
@@ -281,15 +281,15 @@ export const DefaultRoute = (): IRoute => ({
       payload: ClashMode.Global,
       invert: false,
       action: RuleAction.Route,
-      outbound: DefaultOutboundIds.Select,
+      outbound: DefaultOutboundIds.Global,
       sniffer: [],
       strategy: Strategy.Default,
       server: ''
     },
     {
       id: sampleID(),
-      type: RuleType.Inline,
-      payload: '{\n  "network": "udp",\n  "port": 443\n}',
+      type: RuleType.Protocol,
+      payload: 'quic',
       invert: false,
       action: RuleAction.Reject,
       outbound: '',
@@ -311,7 +311,7 @@ export const DefaultRoute = (): IRoute => ({
     {
       id: sampleID(),
       type: RuleType.RuleSet,
-      payload: DefaultRulesetIds.GEOSITE_CN,
+      payload: DefaultRulesetIds.GEOSITE_PRIVATE,
       invert: false,
       action: RuleAction.Route,
       outbound: DefaultOutboundIds.Direct,
@@ -319,11 +319,10 @@ export const DefaultRoute = (): IRoute => ({
       strategy: Strategy.Default,
       server: ''
     },
-
     {
       id: sampleID(),
       type: RuleType.RuleSet,
-      payload: DefaultRulesetIds.GEOSITE_PRIVATE,
+      payload: DefaultRulesetIds.GEOSITE_CN,
       invert: false,
       action: RuleAction.Route,
       outbound: DefaultOutboundIds.Direct,
@@ -378,22 +377,22 @@ export const DefaultRoute = (): IRoute => ({
       path: ''
     },
     {
-      id: DefaultRulesetIds.GEOSITE_PRIVATE,
+      id: DefaultRulesetIds.GEOIP_PRIVATE,
       type: RulesetType.Remote,
-      tag: DefaultRulesetIds.GEOSITE_PRIVATE,
+      tag: DefaultRulesetIds.GEOIP_PRIVATE,
       format: RulesetFormat.Binary,
-      url: 'https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/private.srs',
+      url: 'https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip/private.srs',
       download_detour: DefaultOutboundIds.Direct,
       update_interval: '',
       rules: '',
       path: ''
     },
     {
-      id: DefaultRulesetIds.GEOIP_PRIVATE,
+      id: DefaultRulesetIds.GEOSITE_PRIVATE,
       type: RulesetType.Remote,
-      tag: DefaultRulesetIds.GEOIP_PRIVATE,
+      tag: DefaultRulesetIds.GEOSITE_PRIVATE,
       format: RulesetFormat.Binary,
-      url: 'https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip/private.srs',
+      url: 'https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/private.srs',
       download_detour: DefaultOutboundIds.Direct,
       update_interval: '',
       rules: '',
@@ -451,7 +450,7 @@ export const DefaultDnsServer = (): IDNSServer => ({
 export const DefaultDnsServers = (): IDNSServer[] => [
   {
     id: DefaultDnsServersIds.LocalDns,
-    tag: 'local-dns',
+    tag: DefaultDnsServersIds.LocalDns,
     address: 'https://223.5.5.5/dns-query',
     address_resolver: DefaultDnsServersIds.LocalDnsResolver,
     detour: DefaultOutboundIds.Direct,
@@ -460,7 +459,7 @@ export const DefaultDnsServers = (): IDNSServer[] => [
   },
   {
     id: DefaultDnsServersIds.LocalDnsResolver,
-    tag: 'local-dns-resolver',
+    tag: DefaultDnsServersIds.LocalDnsResolver,
     address: '223.5.5.5',
     address_resolver: '',
     detour: DefaultOutboundIds.Direct,
@@ -469,7 +468,7 @@ export const DefaultDnsServers = (): IDNSServer[] => [
   },
   {
     id: DefaultDnsServersIds.RemoteDns,
-    tag: 'remote-dns',
+    tag: DefaultDnsServersIds.RemoteDns,
     address: 'tls://8.8.8.8',
     address_resolver: DefaultDnsServersIds.RemoteDnsResolver,
     detour: DefaultOutboundIds.Select,
@@ -478,7 +477,7 @@ export const DefaultDnsServers = (): IDNSServer[] => [
   },
   {
     id: DefaultDnsServersIds.RemoteDnsResolver,
-    tag: 'remote-dns-resolver',
+    tag: DefaultDnsServersIds.RemoteDnsResolver,
     address: '8.8.8.8',
     address_resolver: '',
     detour: DefaultOutboundIds.Select,

@@ -192,7 +192,8 @@ export default {
         },
         server: 'DNS Server',
         payload: 'Payload',
-        notFound: 'Outbound tag is missing.'
+        notFound: 'Outbound tag is missing.',
+        invalid: 'Invalid Parameter'
       }
     },
     rules: {

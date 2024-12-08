@@ -62,7 +62,7 @@ const handleDelete = (index: number) => {
   model.value.splice(index, 1)
 }
 
-const showLost = () => message.warn('kernel.route.rules.notFound')
+const showLost = () => message.warn('kernel.route.rules.invalid')
 
 const isSupportPayload = computed(() => {
   return ![RuleType.RuleSet].includes(fields.value.type as any)

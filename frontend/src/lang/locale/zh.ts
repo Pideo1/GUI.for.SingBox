@@ -192,7 +192,7 @@ export default {
         },
         server: 'DNS服务器',
         payload: '载荷',
-        notFound: '出站丢失'
+        invalid: '无效参数'
       }
     },
     rules: {

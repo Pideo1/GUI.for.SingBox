@@ -2,11 +2,18 @@
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { useBool } from '@/hooks'
-import { deepClone } from '@/utils'
+import { deepClone, isValidJson } from '@/utils'
+import { useBool, useMessage } from '@/hooks'
 import { DraggableOptions } from '@/constant/app'
 import { DefaultDnsRule, DefaultDnsRules } from '@/constant/profile'
-import { RuleType, ClashMode, RulesetType, RulesetFormat, RuleAction } from '@/enums/kernel'
+import {
+  RuleType,
+  ClashMode,
+  RulesetType,
+  RulesetFormat,
+  RuleAction,
+  RuleActionReject
+} from '@/enums/kernel'
 import {
   DnsRuleTypeOptions,
   DnsRuleActionOptions,
@@ -29,6 +36,7 @@ const fields = ref<IDNSRule>(DefaultDnsRule())
 
 const { t } = useI18n()
 const [showEditModal] = useBool(false)
+const { message } = useMessage()
 
 const handleAdd = () => {
   ruleId = -1
@@ -60,6 +68,42 @@ const handleUse = (ruleset: any) => {
   fields.value.payload = ruleset.id
 }
 
+const showLost = () => message.warn('kernel.route.rules.invalid')
+
+const hasLost = (rule: IDNSRule) => {
+  const checkServer = () => {
+    if (rule.action === RuleAction.Route) {
+      if (!props.serversOptions.find((v) => v.value === rule.server)) {
+        return true
+      }
+      return false
+    } else if (rule.action === RuleAction.RouteOptions) {
+      return !isValidJson(rule.server)
+    } else if (rule.action === RuleAction.Reject) {
+      return ![RuleActionReject.Default, RuleActionReject.Drop].includes(rule.server as any)
+    }
+    return false
+  }
+
+  const checkPayload = () => {
+    if (rule.type === RuleType.Inbound) {
+      return !props.inboundOptions.find((v) => v.value === rule.payload)
+    }
+    if (rule.type === RuleType.Outbound) {
+      return rule.payload !== 'any' && !props.outboundOptions.find((v) => v.value === rule.payload)
+    }
+    if (rule.type === RuleType.RuleSet) {
+      return !props.ruleSet.find((v) => v.id === rule.payload)
+    }
+    if (rule.type === RuleType.Inline) {
+      return !isValidJson(rule.payload)
+    }
+    return !rule.payload
+  }
+
+  return checkServer() || checkPayload()
+}
+
 const renderRule = (rule: IDNSRule) => {
   const { type, payload, server, action } = rule
   const children: string[] = [type]
@@ -89,6 +133,7 @@ const renderRule = (rule: IDNSRule) => {
   <div v-draggable="[model, DraggableOptions]">
     <Card v-for="(rule, index) in model" :key="rule.id" class="rule-item">
       <div class="font-bold">
+        <span v-if="hasLost(rule)" @click="showLost" class="warn"> [ ! ] </span>
         {{ renderRule(rule) }}
       </div>
       <div class="ml-auto">

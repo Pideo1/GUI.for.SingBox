@@ -59,7 +59,7 @@ const onInterfaceChange = (interface_name: string) =>
         auto-size
       />
     </Card>
-    <Card :title="t('kernel.inbounds.allowLan')" class="card-item">
+    <Card :title="t('kernel.allow-lan')" class="card-item">
       <Switch v-model="kernelApiStore.config['allow-lan']" @change="onAllowLanChange" />
     </Card>
 
