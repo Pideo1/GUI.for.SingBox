@@ -591,7 +591,11 @@ export default {
       version: '切换版本',
       stable: '稳定版',
       alpha: '内测版',
-      grant: '授予特权'
+      grant: '授予特权',
+      local: '本地',
+      remote: '远程',
+      update: '更新',
+      restart: '重启核心'
     },
     userAgent: {
       name: '用户代理(User-Agent)',

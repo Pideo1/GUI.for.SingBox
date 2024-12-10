@@ -592,7 +592,11 @@ export default {
       version: 'Switch version',
       stable: 'Stable version',
       alpha: 'Alpha version',
-      grant: 'Grant Privileges'
+      grant: 'Grant Privileges',
+      local: 'Local',
+      remote: 'Remote',
+      update: 'Update',
+      restart: 'Restart Core'
     },
     userAgent: {
       name: 'User-Agent',

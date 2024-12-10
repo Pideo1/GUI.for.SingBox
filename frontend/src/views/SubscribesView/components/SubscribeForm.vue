@@ -133,21 +133,21 @@ if (props.isUpdate) {
       </div>
       <div class="form-item">
         <div class="name">{{ t('subscribe.includeProtocol') }}</div>
-        <!-- <Input
+        <Input
           v-model="sub.includeProtocol"
-          :placeholder="ProxyTypeOptions.map((v) => v.label).join('|')"
+          placeholder="direct|mixed|socks|http..."
           auto-size
           class="input"
-        /> -->
+        />
       </div>
       <div class="form-item">
         <div class="name">{{ t('subscribe.excludeProtocol') }}</div>
-        <!-- <Input
+        <Input
           v-model="sub.excludeProtocol"
-          :placeholder="ProxyTypeOptions.map((v) => v.label).join('|')"
+          placeholder="direct|mixed|socks|http..."
           auto-size
           class="input"
-        /> -->
+        />
       </div>
       <div class="form-item">
         <div class="name">{{ t('subscribe.proxyPrefix') }}</div>

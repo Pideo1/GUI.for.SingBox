@@ -246,12 +246,12 @@ initVersion()
   </div>
   <div class="tags">
     <Tag @click="updateLocalVersion(true)" style="cursor: pointer">
-      {{ t('kernel.local') }}
+      {{ t('settings.kernel.local') }}
       :
       {{ localVersionLoading ? 'Loading' : localVersion || t('kernel.notFound') }}
     </Tag>
     <Tag @click="updateRemoteVersion(true)" style="cursor: pointer">
-      {{ t('kernel.remote') }}
+      {{ t('settings.kernel.remote') }}
       :
       {{ remoteVersionLoading ? 'Loading' : remoteVersion }}
     </Tag>
@@ -262,7 +262,7 @@ initVersion()
       size="small"
       type="primary"
     >
-      {{ t('kernel.update') }} : {{ remoteVersion }}
+      {{ t('settings.kernel.update') }} : {{ remoteVersion }}
     </Button>
     <Button
       v-show="!localVersionLoading && !remoteVersionLoading && needRestart"
@@ -271,7 +271,7 @@ initVersion()
       size="small"
       type="primary"
     >
-      {{ t('kernel.restart') }}
+      {{ t('settings.kernel.restart') }}
     </Button>
   </div>
 
