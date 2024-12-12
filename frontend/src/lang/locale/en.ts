@@ -134,7 +134,9 @@ export default {
       noSubs: 'The subscription list is empty.',
       empty: 'No available proxies under this subscription.',
       builtIn: 'Built-In',
-      subscriptions: 'Subscriptions'
+      subscriptions: 'Subscriptions',
+      include: 'Include',
+      exclude: 'Exclude'
     },
     route: {
       tab: {

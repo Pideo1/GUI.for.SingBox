@@ -100,9 +100,12 @@ interface IOutbound {
   type: OutboundType
   outbounds: IProxy[]
   url: string
-  interval: number
+  interval: string
   tolerance: number
   interrupt_exist_connections: boolean
+  // gui
+  include: string
+  exclude: string
 }
 
 type RuleType =

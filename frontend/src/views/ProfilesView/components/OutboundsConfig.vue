@@ -248,6 +248,20 @@ subscribesStore.subscribes.forEach(async ({ id, name, proxies }) => {
       {{ t('kernel.outbounds.type') }}
       <Radio v-model="fields.type" :options="OutboundOptions" />
     </div>
+    <template v-if="fields.type !== Outbound.Direct">
+      <div class="form-item">
+        {{ t('kernel.outbounds.interrupt_exist_connections') }}
+        <Switch v-model="fields.interrupt_exist_connections" />
+      </div>
+      <div class="form-item">
+        {{ t('kernel.outbounds.include') }}
+        <Input v-model="fields.include" />
+      </div>
+      <div class="form-item">
+        {{ t('kernel.outbounds.exclude') }}
+        <Input v-model="fields.exclude" />
+      </div>
+    </template>
     <template v-if="fields.type === Outbound.Direct">
       <Empty :description="t('kernel.outbounds.directDesc')" />
     </template>
@@ -258,15 +272,11 @@ subscribesStore.subscribes.forEach(async ({ id, name, proxies }) => {
       </div>
       <div class="form-item">
         {{ t('kernel.outbounds.interval') }}
-        <Input v-model="fields.interval" type="number" />
+        <Input v-model="fields.interval" />
       </div>
       <div class="form-item">
         {{ t('kernel.outbounds.tolerance') }}
         <Input v-model="fields.tolerance" type="number" />
-      </div>
-      <div class="form-item">
-        {{ t('kernel.outbounds.interrupt_exist_connections') }}
-        <Switch v-model="fields.interrupt_exist_connections" />
       </div>
     </template>
     <template v-if="[Outbound.Selector, Outbound.Urltest].includes(fields.type as any)">

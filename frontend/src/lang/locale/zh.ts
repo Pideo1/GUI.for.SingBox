@@ -134,7 +134,9 @@ export default {
       noSubs: '订阅列表为空',
       empty: '该订阅下无可用代理',
       builtIn: '内置',
-      subscriptions: '订阅'
+      subscriptions: '订阅',
+      include: '包含',
+      exclude: '排除'
     },
     route: {
       tab: {

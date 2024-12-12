@@ -64,12 +64,32 @@ const generateOutbounds = async (outbounds: IOutbound[]) => {
   const SubscriptionCache: Recordable<any[]> = {}
   const proxiesSet = new Set<any>()
 
+  const createTagMatcher = (include: string, exclude: string) => {
+    const includeRegex = include ? new RegExp(include) : null
+    const excludeRegex = exclude ? new RegExp(exclude) : null
+    return (tag: string) => {
+      const flag1 = includeRegex ? includeRegex.test(tag) : true
+      const flag2 = excludeRegex ? !excludeRegex.test(tag) : true
+      return flag1 && flag2
+    }
+  }
+
   const subscribesStore = useSubscribesStore()
 
   for (const outbound of outbounds) {
-    const _outbound: Recordable = { type: outbound.type, tag: outbound.tag }
+    const _outbound: Recordable = {
+      type: outbound.type,
+      tag: outbound.tag
+    }
+    if (outbound.type === Outbound.Urltest) {
+      _outbound.url = outbound.url
+      _outbound.interval = outbound.interval
+      _outbound.tolerance = outbound.tolerance
+    }
     if (outbound.type === Outbound.Selector || outbound.type === Outbound.Urltest) {
+      _outbound.interrupt_exist_connections = outbound.interrupt_exist_connections
       _outbound.outbounds = []
+      const isTagMatching = createTagMatcher(outbound.include, outbound.exclude)
       for (const proxy of outbound.outbounds) {
         if (proxy.type === 'Built-in') {
           _outbound.outbounds.push(proxy.tag)
@@ -84,11 +104,13 @@ const generateOutbounds = async (outbounds: IOutbound[]) => {
             }
           }
           if (proxy.type === 'Subscription') {
-            _outbound.outbounds.push(...SubscriptionCache[subId].map((v) => v.tag))
+            _outbound.outbounds.push(
+              ...SubscriptionCache[subId].map((v) => v.tag).filter((tag) => isTagMatching(tag))
+            )
             SubscriptionCache[subId].forEach((v) => proxiesSet.add(v))
           } else {
             const _proxy = SubscriptionCache[subId].find((v) => v.tag === proxy.tag)
-            if (_proxy) {
+            if (_proxy && isTagMatching(_proxy.tag)) {
               _outbound.outbounds.push(_proxy.tag)
               proxiesSet.add(_proxy)
             }

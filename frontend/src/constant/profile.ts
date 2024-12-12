@@ -140,8 +140,10 @@ export const DefaultOutbound = (): IOutbound => ({
   outbounds: [],
   interrupt_exist_connections: true,
   url: 'https://www.gstatic.com/generate_204',
-  interval: 300,
-  tolerance: 150
+  interval: '3m',
+  tolerance: 150,
+  include: '',
+  exclude: ''
 })
 
 export const DefaultOutbounds = (): IOutbound[] => [
@@ -152,8 +154,10 @@ export const DefaultOutbounds = (): IOutbound[] => [
     outbounds: [{ id: DefaultOutboundIds.Urltest, type: 'Built-in', tag: t('outbound.urltest') }],
     interrupt_exist_connections: true,
     url: '',
-    interval: 300,
-    tolerance: 150
+    interval: '3m',
+    tolerance: 150,
+    include: '',
+    exclude: ''
   },
   {
     id: DefaultOutboundIds.Urltest,
@@ -162,8 +166,10 @@ export const DefaultOutbounds = (): IOutbound[] => [
     outbounds: [],
     interrupt_exist_connections: true,
     url: 'https://www.gstatic.com/generate_204',
-    interval: 300,
-    tolerance: 150
+    interval: '3m',
+    tolerance: 150,
+    include: '',
+    exclude: ''
   },
   {
     id: DefaultOutboundIds.Direct,
@@ -172,8 +178,10 @@ export const DefaultOutbounds = (): IOutbound[] => [
     outbounds: [],
     interrupt_exist_connections: true,
     url: '',
-    interval: 300,
-    tolerance: 150
+    interval: '3m',
+    tolerance: 150,
+    include: '',
+    exclude: ''
   },
   {
     id: DefaultOutboundIds.Fallback,
@@ -185,8 +193,10 @@ export const DefaultOutbounds = (): IOutbound[] => [
     ],
     interrupt_exist_connections: true,
     url: '',
-    interval: 300,
-    tolerance: 150
+    interval: '3m',
+    tolerance: 150,
+    include: '',
+    exclude: ''
   },
   {
     id: DefaultOutboundIds.Global,
@@ -200,8 +210,10 @@ export const DefaultOutbounds = (): IOutbound[] => [
     ],
     interrupt_exist_connections: true,
     url: '',
-    interval: 300,
-    tolerance: 150
+    interval: '3m',
+    tolerance: 150,
+    include: '',
+    exclude: ''
   }
 ]
 
